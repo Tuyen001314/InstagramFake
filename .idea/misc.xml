@@ -28,7 +28,8 @@
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/font/raleway_dots.xml" value="0.1111111111111111" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_add_post.xml" value="0.264" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_comment.xml" value="0.264" />
-        <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_cropper.xml" value="0.1" />
+        <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_other_user_profile.xml" value="0.2441123188405797" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_set_up.xml" value="0.25" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_setting.xml" value="0.25" />
@@ -38,6 +39,7 @@
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_specific.xml" value="0.21875" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_specific_chat.xml" value="0.264" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_splash.xml" value="0.264" />
+        <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/activity_update.xml" value="0.16799999999999998" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/comment_post.xml" value="0.264" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/content_setting.xml" value="0.245018115942029" />
         <entry key="..\:/Android Project/BlogAndChat/app/src/main/res/layout/each_post.xml" value="0.264" />

@@ -41,11 +41,19 @@ class SettingActivity : AppCompatActivity() {
         }
 
         btn_edit.setOnClickListener {
-            val intent: Intent = Intent(this, SetUpActivity::class.java)
+            val intent = Intent(this, UpdateActivity::class.java)
             intent.putExtra("email", user.email)
             intent.putExtra("id", user.id)
+            intent.putExtra("image", user.image)
+            intent.putExtra("name", user.name)
             startActivity(intent)
             //startActivity(Intent(this, SetUpActivity::class.java));
+        }
+
+        circleImageView.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.setting_activity, ImageFragment(user.image), null)
+                .commit()
         }
 
         val id = FirebaseAuth.getInstance().uid

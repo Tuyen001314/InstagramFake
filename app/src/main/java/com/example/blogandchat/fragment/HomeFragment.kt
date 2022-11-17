@@ -8,17 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.fragment.app.viewModels
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.OnClickImage
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.AddPostActivity
-import com.example.blogandchat.activity.MainActivity
 import com.example.blogandchat.adapter.PostAdapter
-import com.example.blogandchat.home.HomeViewModel
 import com.example.blogandchat.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -46,7 +44,7 @@ class HomeFragment : Fragment() {
     private val postList: MutableList<Post> = ArrayList()
     private lateinit var listenerRegistration: ListenerRegistration
 
-    private val viewModel by navGraphViewModels<HomeViewModel>(R.id.home_fragment)
+    //private val viewModel by navGraphViewModels<HomeViewModel>(R.id.mobile_navigation)
 
 
     override fun onCreateView(
@@ -60,6 +58,8 @@ class HomeFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
 
         floatingActionButton.setOnClickListener(View.OnClickListener {
             startActivity(
@@ -102,7 +102,6 @@ class HomeFragment : Fragment() {
         adapter = activity?.let {
             PostAdapter(it, postList, object : OnClickImage {
                 override fun click(id: String) {
-                    //val fragmentManager: FragmentManager(
                     val transaction = fragmentManager?.beginTransaction()
                     if (transaction != null) {
                         transaction.replace(R.id.home_fragment, ImageFragment(id), null)
@@ -110,24 +109,23 @@ class HomeFragment : Fragment() {
                         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         transaction.commit()
                     }
-
-                    //Toast.makeText(context, "click image", Toast.LENGTH_SHORT).show()
                 }
             })
         }!!
+
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
 
-//        if(viewModel.listState != null)
-//        {
+//        if (viewModel.listState != null){
 //            recyclerView.layoutManager?.onRestoreInstanceState(viewModel.listState)
 //            viewModel.listState = null
 //        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        //viewModel.listState = recyclerView.layoutManager?.onSaveInstanceState()
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        viewModel.listState = recyclerView.layoutManager?.onSaveInstanceState()
+//    }
+
 }

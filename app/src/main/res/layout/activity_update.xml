@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F2EEF8"
-    tools:context=".activity.SetUpActivity">
+    tools:context=".activity.UpdateActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/setup_toolbar"
@@ -21,7 +21,7 @@
         tools:ignore="MissingConstraints" />
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/circleImageView"
+        android:id="@+id/circleImageView_change"
         android:layout_width="240dp"
         android:layout_height="240dp"
         android:src="@drawable/user_add"
@@ -32,7 +32,7 @@
         app:layout_constraintVertical_bias="0.2" />
 
     <EditText
-        android:id="@+id/edt_name_enter"
+        android:id="@+id/edt_name_enter_change"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="25dp"
@@ -48,11 +48,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/circleImageView"
+        app:layout_constraintTop_toBottomOf="@+id/circleImageView_change"
         app:layout_constraintVertical_bias="0.23" />
 
     <Button
-        android:id="@+id/btn_save"
+        android:id="@+id/btn_save_change"
         style="@style/ButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
@@ -67,19 +67,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edt_name_enter" />
+        app:layout_constraintTop_toBottomOf="@+id/edt_name_enter_change" />
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/progressBar_change"
         android:visibility="invisible"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/edt_name_enter"
+        app:layout_constraintBottom_toTopOf="@+id/edt_name_enter_change"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintVertical_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/circleImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/circleImageView_change" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

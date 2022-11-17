@@ -16,10 +16,17 @@
         android:theme="@style/Theme.BlogAndChat"
         tools:targetApi="31">
         <activity
-            android:name=".activity.SpecificChat"
-            android:theme="@style/Theme.Design.NoActionBar"
-            android:parentActivityName=".activity.MainActivity"
+            android:name=".activity.CropperActivity"
             android:exported="false" />
+        <activity
+            android:name=".activity.UpdateActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Design.NoActionBar" />
+        <activity
+            android:name=".activity.SpecificChat"
+            android:exported="false"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/Theme.Design.NoActionBar" />
         <activity
             android:name=".activity.SettingActivity"
             android:exported="false"
@@ -34,6 +41,7 @@
             android:exported="false" />
         <activity
             android:name=".activity.SetUpActivity"
+            android:theme="@style/Theme.BlogAndChat.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".activity.OtherUserProfile"
@@ -43,9 +51,9 @@
             android:exported="false" />
         <activity
             android:name=".activity.AddPostActivity"
+            android:exported="false"
             android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.Design.NoActionBar"
-            android:exported="false" />
+            android:theme="@style/Theme.Design.NoActionBar" />
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true">
@@ -58,6 +66,11 @@
         <activity
             android:name=".activity.MainActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

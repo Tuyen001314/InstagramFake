@@ -1,23 +1,24 @@
 package com.example.blogandchat.activity
 
-import android.content.Intent
 import android.net.Uri
-import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.activity_add_post.*
 import java.util.*
 
 class AddPostViewModel : ViewModel() {
     val uiState = MutableLiveData<AddPostUiState>()
 
     fun addPost(caption: String) {
-        if (uiState.value?.uri == null) return
+        if (uiState.value?.uri == null) {
+            uiState.postValue(
+                AddPostUiState(addError = false)
+            )
+            return
+        }
         val filename = UUID.randomUUID().toString()
 
         val postRef = FirebaseStorage.getInstance().reference.child("post_images")
@@ -34,12 +35,22 @@ class AddPostViewModel : ViewModel() {
                 val ref = FirebaseFirestore.getInstance().collection("posts").add(postMap)
                     .addOnSuccessListener { documentReference ->
                         uiState.postValue(
-                            AddPostUiState(uri = null, addingPost = false, addPostSuccess = true)
+                            AddPostUiState(
+                                uri = null,
+                                addingPost = false,
+                                addPostSuccess = true,
+                                addError = true
+                            )
                         )
                     }
                     .addOnFailureListener { e ->
                         uiState.postValue(
-                            AddPostUiState(uri = null, addingPost = false, addPostSuccess = false)
+                            AddPostUiState(
+                                uri = null,
+                                addingPost = false,
+                                addPostSuccess = false,
+                                addError = true
+                            )
                         )
                     }
             }
@@ -58,5 +69,6 @@ data class AddPostUiState(
     val uri: Uri? = null,
     val caption: String = "",
     val addingPost: Boolean = false,
-    val addPostSuccess: Boolean = false
+    val addPostSuccess: Boolean = false,
+    val addError: Boolean = true
 )

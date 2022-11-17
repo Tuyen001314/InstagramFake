@@ -8,10 +8,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
-import com.example.blogandchat.databinding.ActivityMainBinding
 import com.example.blogandchat.fragment.*
 import com.example.blogandchat.model.User
 import com.google.android.material.navigation.NavigationView
@@ -25,15 +28,19 @@ import kotlinx.android.synthetic.main.nav_header_layout.*
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
-    private lateinit var binding: ActivityMainBinding
+    //private lateinit var binding: ActivityMainBinding
     private lateinit var user: User
     //private lateinit var bottomNav: BottomNavigationView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+//        binding = ActivityMainBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
+        setContentView(R.layout.activity_main)
+
+        //val navController = findNavController(R.id.container)
 
         val docRef = FirebaseFirestore.getInstance().collection("users")
             .document(FirebaseAuth.getInstance().uid.toString())
@@ -71,7 +78,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        setupActionBarWithNavController(navController, appBarConfiguration)
 //        navView.setupWithNavController(navController)
 
-        binding.bottomNav.setOnItemSelectedListener {id ->
+//        val appBarConfiguration = AppBarConfiguration(setOf(
+//            R.id.navigation_home, R.id.navigation_favorite, R.id.navigation_search, R.id.navigation_chat ))
+//        setupActionBarWithNavController(navController, appBarConfiguration)
+//        bottomNav.setupWithNavController(navController)
+
+        bottomNav.setOnItemSelectedListener {id ->
             when (id) {
                 R.id.home -> {
                     val homeFragment = HomeFragment()
@@ -103,22 +115,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
+
+
         // to make the Navigation drawer icon always appear on the action bar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun loadFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
+        //transaction.hide(fragment)
         transaction.replace(R.id.container, fragment)
-        transaction.addToBackStack(null)
+        //transaction.addToBackStack(null)
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         transaction.commit()
     }
-//
-//    fun showImage(id: String) {
-//        val transaction = supportFragmentManager.beginTransaction()
-//
-//    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
