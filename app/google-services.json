@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "140076912913",
+    "firebase_url": "https://blogandchat-254f3-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "blogandchat-254f3",
+    "storage_bucket": "blogandchat-254f3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140076912913:android:649188cf23328a8a373cb0",
+        "android_client_info": {
+          "package_name": "com.example.blogandchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140076912913-h2ct21v5sln54592tk7rbb9spl1hb51q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.blogandchat",
+            "certificate_hash": "a33d2dc8ed64303a63d1562456a71afc975cace7"
+          }
+        },
+        {
+          "client_id": "140076912913-4rrbc944enlrt7gb7b3g7kis13i74amf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRgxR7I6TY9ODcoAlm9ryrD5FNhDAgWz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140076912913-4rrbc944enlrt7gb7b3g7kis13i74amf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

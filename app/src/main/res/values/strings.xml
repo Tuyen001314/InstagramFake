@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Instag App SM</string>
+    <string name="username">Enter Your Email</string>
+    <string name="password">Enter Your Password</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_up_content">Sign Up</string>
+    <string name="already_registered_sign_in">Already Registered ? Sign In</string>
+    <string name="sign_in_content">Sign In</string>
+    <string name="sign_in">sign in</string>
+    <string name="not_registered_yet_sign_up">Not Registered Yet ? Sign Up</string>
+    <string name="my_profile">My profile</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="instag">Instagram</string>
+    <string name="enter_your_name">Enter Your Name</string>
+    <string name="write_caption_here">Write Caption Here ...</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
+    <string name="title_activity_setting">SettingActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
