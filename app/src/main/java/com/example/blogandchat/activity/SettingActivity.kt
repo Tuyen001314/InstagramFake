@@ -60,14 +60,16 @@ class SettingActivity : AppCompatActivity() {
         FirebaseFirestore.getInstance().collection("users/$id/following")
             .get().addOnSuccessListener { documents ->
                 val tmp = documents.size()
-                followingMyProfile.text = "Following: $tmp"
+                followingCountMyProfile.text = "$tmp"
             }
 
         FirebaseFirestore.getInstance().collection("users/$id/follower")
             .get().addOnSuccessListener { documents ->
                 val tmp = documents.size()
-                followerMyProfile.text = "Follower: $tmp"
+                followerCountMyProfile.text = "$tmp"
             }
+
+
 
         adapter = ProfileAdapter(this, listPostUser, object : OnClickImage {
             override fun click(id: String) {
@@ -93,6 +95,7 @@ class SettingActivity : AppCompatActivity() {
                         adapter.notifyDataSetChanged()
                     }
                 }
+                postCountMyProfile.text = "${listPostUser.size}"
                 listenerRegistration.remove()
             })
 
@@ -100,6 +103,8 @@ class SettingActivity : AppCompatActivity() {
         recyclerViewProfile.setHasFixedSize(true)
         recyclerViewProfile.layoutManager = GridLayoutManager(this, 3);
         recyclerViewProfile.adapter = adapter
+
+
 
     }
 }

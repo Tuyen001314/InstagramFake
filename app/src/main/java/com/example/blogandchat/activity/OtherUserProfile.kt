@@ -42,13 +42,13 @@ class OtherUserProfile : AppCompatActivity() {
         FirebaseFirestore.getInstance().collection("users/$id/following")
             .get().addOnSuccessListener { documents ->
                 val tmp = documents.size()
-                following.text = "Following: $tmp"
+                followingCount.text = "$tmp"
             }
 
         FirebaseFirestore.getInstance().collection("users/$id/follower")
             .get().addOnSuccessListener { documents ->
                 val tmp = documents.size()
-                follower.text = "Follower: $tmp"
+                followerCount.text = "$tmp"
             }
 
 
@@ -88,6 +88,7 @@ class OtherUserProfile : AppCompatActivity() {
                         adapter.notifyDataSetChanged()
                     }
                 }
+                postCount.text = "${listPostUser.size}"
                 listenerRegistration.remove()
             })
 

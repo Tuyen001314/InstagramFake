@@ -46,18 +46,18 @@
             app:layout_constraintTop_toBottomOf="@id/setup_toolbar"
             app:layout_constraintVertical_bias="0.0">
 
+
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/circleImageView"
-                android:layout_width="136dp"
-
-                android:layout_height="136dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/avt_img"
                 app:layout_constraintBottom_toTopOf="@+id/btn_edit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.05"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.15" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
@@ -72,41 +72,96 @@
             <TextView
                 android:id="@+id/edt_name_enter"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
                 android:gravity="center"
                 android:text="Linh"
-                android:layout_marginTop="10dp"
                 android:textColor="@color/cardview_dark_background"
-                android:textSize="21sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/circleImageView"
-                app:layout_constraintTop_toTopOf="@+id/circleImageView" />
+                android:textSize="18sp"
+                app:layout_constraintBottom_toTopOf="@+id/btn_edit"
+                app:layout_constraintEnd_toEndOf="@+id/circleImageView"
+                app:layout_constraintStart_toStartOf="@+id/circleImageView"
+                app:layout_constraintTop_toBottomOf="@+id/circleImageView" />
 
+            <TextView
+                android:id="@+id/postMyProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                app:layout_constraintVertical_bias="0.75"
+                android:text="Post"
+                android:textColor="@color/cardview_dark_background"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
+                app:layout_constraintStart_toEndOf="@+id/circleImageView"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/postCountMyProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="3"
+                android:textColor="@color/cardview_dark_background"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/postMyProfile"
+                app:layout_constraintEnd_toEndOf="@+id/postMyProfile"
+                app:layout_constraintStart_toStartOf="@+id/postMyProfile" />
 
             <TextView
                 android:id="@+id/followingMyProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Following"
+                android:layout_marginEnd="15dp"
                 android:textColor="@color/cardview_dark_background"
-                android:layout_marginStart="20dp"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
-                app:layout_constraintStart_toEndOf="@+id/circleImageView"
-                app:layout_constraintTop_toBottomOf="@+id/edt_name_enter" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.75" />
+
+            <TextView
+                android:id="@+id/followerCountMyProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/cardview_dark_background"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/followerMyProfile"
+                app:layout_constraintEnd_toStartOf="@+id/followingMyProfile"
+                app:layout_constraintStart_toEndOf="@+id/postMyProfile" />
+
 
             <TextView
                 android:id="@+id/followerMyProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
+                android:text="Follower"
                 android:textColor="@color/cardview_dark_background"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.6"
-                app:layout_constraintStart_toEndOf="@+id/followingMyProfile"
-                app:layout_constraintTop_toBottomOf="@+id/edt_name_enter" />
+                app:layout_constraintEnd_toStartOf="@+id/followingMyProfile"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/postMyProfile"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.75" />
+
+            <TextView
+                android:id="@+id/followingCountMyProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/cardview_dark_background"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/followingMyProfile"
+                app:layout_constraintEnd_toEndOf="@+id/followingMyProfile"
+                app:layout_constraintStart_toStartOf="@+id/followingMyProfile" />
 
             <Button
                 android:id="@+id/btn_edit"
@@ -132,7 +187,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_weight="2"
+            android:layout_weight="2.0"
             android:layout_marginTop="5dp"
             android:layout_height="0dp">
 
