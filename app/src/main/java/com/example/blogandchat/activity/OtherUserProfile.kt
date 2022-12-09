@@ -232,6 +232,7 @@ class OtherUserProfile : AppCompatActivity() {
                                         val timeRequest: MutableMap<String, Any> = HashMap()
                                         timeRequest["id"] = id.toString()
                                         timeRequest["timestamp"] = FieldValue.serverTimestamp()
+                                        timeRequest["timeseen"] =  "0"
                                         FirebaseFirestore.getInstance().collection("users/$idCurrent/message")
                                             .document(id)
                                             .set(timeRequest)

@@ -1,11 +1,18 @@
 package com.example.blogandchat.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
 import com.example.blogandchat.R
+import com.example.blogandchat.adapter.VideoAdapter
+import com.example.blogandchat.model.Video
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.android.synthetic.main.fragment_search.*
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,6 +25,8 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class SearchFragment : Fragment() {
+
+    private lateinit var adapter: VideoAdapter;
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -36,6 +45,36 @@ class SearchFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search, container, false)
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+
+//        val video = Video("abc")
+//        FirebaseDatabase.getInstance().reference.child("videos").push().setValue(video).addOnCompleteListener {  }
+
+        val options: FirebaseRecyclerOptions<Video> =
+            FirebaseRecyclerOptions.Builder<Video>()
+                .setQuery(
+                    FirebaseDatabase.getInstance().reference.child("videos"),
+                    Video::class.java
+                )
+                .build()
+
+        adapter = VideoAdapter(options)
+        viewPager.adapter = adapter
+    }
+
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        adapter.stopListening()
     }
 
     companion object {
@@ -57,4 +96,5 @@ class SearchFragment : Fragment() {
                 }
             }
     }
+
 }

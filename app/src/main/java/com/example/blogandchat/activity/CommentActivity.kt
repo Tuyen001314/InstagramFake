@@ -8,11 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.CommentAdapter
 import com.example.blogandchat.model.Comments
-import com.example.blogandchat.model.Post
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import kotlinx.android.synthetic.main.activity_comment.*
-import com.example.blogandchat.model.CommentsId as CommentsId
 
 class CommentActivity : AppCompatActivity() {
 
@@ -21,6 +18,8 @@ class CommentActivity : AppCompatActivity() {
     private lateinit var idUserComment: String
     private lateinit var listenerRegistration: ListenerRegistration
     private var listComments: MutableList<Comments> = ArrayList()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +55,7 @@ class CommentActivity : AppCompatActivity() {
                 ).show()
             }
         }
-        adapter = CommentAdapter(this, listComments);
+        adapter = CommentAdapter(this, listComments, postCommment);
         recycler_comments.layoutManager = LinearLayoutManager(this)
         recycler_comments.setHasFixedSize(true)
         recycler_comments.adapter = adapter

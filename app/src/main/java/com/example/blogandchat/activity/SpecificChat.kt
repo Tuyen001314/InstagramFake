@@ -2,7 +2,6 @@ package com.example.blogandchat.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,13 +9,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
+import com.example.blogandchat.RetrofitInstance
 import com.example.blogandchat.adapter.MessageAdapter
 import com.example.blogandchat.model.Message
+import com.example.blogandchat.model.NotificationData
+import com.example.blogandchat.model.PushNotification
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_specific_chat.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -106,6 +112,15 @@ class SpecificChat : AppCompatActivity() {
                     Message(currentTime = currentTime, message = enterdMessage,
                         senderId = it1, timeStamp = date.time)
                 }
+
+                FirebaseAuth.getInstance().uid?.let { it1 ->
+                    FirebaseFirestore.getInstance().collection("users/${mReceiverUid}/message").document(
+                        it1
+                    ).update(mapOf(
+                        "timeseen" to "1"
+                    ))
+                }
+
                 val firebaseDatabase = FirebaseDatabase.getInstance()
                 firebaseDatabase.reference.child("chats")
                     .child(senderRoom)
@@ -117,12 +132,17 @@ class SpecificChat : AppCompatActivity() {
                             .child("messages")
                             .push()
                             .setValue(message).addOnCompleteListener(OnCompleteListener<Void?> { })
+
+//                        if (mReceiverUid != null) {
+//                            PushNotification(NotificationData("abc", enterdMessage).toString(), mReceiverUid).also {
+//                                sendNotification((it))
+//                            }
+//                        }
                     })
+
                 edt_chat.text = null
             }
         })
-
-
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -136,4 +156,15 @@ class SpecificChat : AppCompatActivity() {
         super.onStop()
         messagesAdapter.notifyDataSetChanged()
     }
+
+//    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
+//        try {
+//            val response = RetrofitInstance.api.postNotification(notification)
+//            if (response.isSuccessful) {
+//                //Toast.makeText(spe)
+//            }
+//        } catch (e: Exception) {
+//
+//        }
+//    }
 }

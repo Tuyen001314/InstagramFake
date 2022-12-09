@@ -3,28 +3,27 @@ package com.example.blogandchat.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.SpecificChat
+import com.example.blogandchat.model.Message
 import com.example.blogandchat.model.User
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+import com.google.firebase.firestore.ServerTimestamp
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.android.synthetic.main.view_chat_layout.view.*
-import kotlinx.android.synthetic.main.view_chat_layout.view.cardviewOfUser
-import kotlinx.android.synthetic.main.view_chat_layout.view.circleImageViewStatus
-import kotlinx.android.synthetic.main.view_chat_layout.view.nameOfUser
 import kotlinx.android.synthetic.main.view_chat_layout_user.view.*
 
 class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>() {
     private lateinit var listUser: MutableList<User>
     private lateinit var context: Context
+    private lateinit var message: Message
+    private lateinit var time: ServerTimestamp
 
     constructor(context: Context, listUser: MutableList<User>) : this() {
         this.listUser = listUser
@@ -50,12 +49,50 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener { v ->
+
             val intent = Intent(v.context, SpecificChat::class.java)
             intent.putExtra("name", firebaseModel.name)
             intent.putExtra("receiveruid", firebaseModel.id)
             intent.putExtra("imageuri", firebaseModel.image)
             v.context.startActivity(intent)
         })
+
+
+        val senderRoom = FirebaseAuth.getInstance().uid + firebaseModel.id
+
+        val databaseReference: DatabaseReference =
+            FirebaseDatabase.getInstance().reference.child("chats").child(senderRoom)
+                .child("messages")
+
+        val postListener = object : ValueEventListener {
+            @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                //messageList.clear()
+                for (snapshot1 in snapshot.children) {
+                    message = snapshot1.getValue(Message::class.java)!!
+                    if (message != null) {
+                        //messageList.add(message)
+                        //Log.d("hhhhh", "Value is: $message");
+                    }
+                }
+
+                if (message.senderId == FirebaseAuth.getInstance().uid) {
+                    holder.lastMessage.text = "Bạn: " + message.message
+
+                } else {
+                    holder.lastMessage.text = message.message
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                //Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+
+        databaseReference.addValueEventListener(postListener)
+
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -76,6 +113,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
         val nameOfUser: TextView = itemView.nameOfUser1
         val statusOfUser: CircleImageView = itemView.viewStatus
         val avatar: CircleImageView = itemView.cardviewOfUser1
+        val lastMessage: TextView = itemView.statusOfUser
 
     }
 

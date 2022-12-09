@@ -64,7 +64,6 @@ class ChatFragment : Fragment() {
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseFirestore = FirebaseFirestore.getInstance()
 
-
         val id = firebaseAuth.uid;
         firebaseFirestore.collection("users/$id/message")
             .get().addOnSuccessListener { documents ->
