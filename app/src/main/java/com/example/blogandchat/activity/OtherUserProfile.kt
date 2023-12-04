@@ -3,74 +3,77 @@ package com.example.blogandchat.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.blogandchat.OnClickImage
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.ProfileAdapter
+import com.example.blogandchat.databinding.ActivityOtherUserProfileBinding
 import com.example.blogandchat.fragment.ImageFragment
 import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.User
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.EventListener
-import kotlinx.android.synthetic.main.activity_other_user_profile.*
-import kotlinx.android.synthetic.main.activity_setting.*
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
 
 class OtherUserProfile : AppCompatActivity() {
 
-    private var listPostUser: MutableList<Post> = ArrayList();
+    private var listPostUser: MutableList<Post> = ArrayList()
     private lateinit var adapter: ProfileAdapter
     private lateinit var listenerRegistration: ListenerRegistration
     private var check: Boolean = false
     private var checkRequest: Boolean = false
+    private lateinit var binding: ActivityOtherUserProfileBinding
+
     @SuppressLint("ResourceAsColor", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_other_user_profile)
-
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_other_user_profile)
 
         val id = intent.getStringExtra("id")
 
         FirebaseFirestore.getInstance().collection("users/$id/following")
             .get().addOnSuccessListener { documents ->
                 val tmp = documents.size()
-                followingCount.text = "$tmp"
+                binding.followingCount.text = "$tmp"
             }
 
         FirebaseFirestore.getInstance().collection("users/$id/follower")
             .get().addOnSuccessListener { documents ->
                 val tmp = documents.size()
-                followerCount.text = "$tmp"
+                binding.followerCount.text = "$tmp"
             }
-
 
         FirebaseFirestore.getInstance().collection("users").whereEqualTo("id", id).get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
                     // val firebaseModel =
                     val user = (document.toObject(User::class.java))
-                    Glide.with(this).load(user.image).into(circleImageViewOther)
-                    nameUserOther.text = user.name
+                    Glide.with(this).load(user.image).into(binding.circleImageViewOther)
+                    binding.nameUserOther.text = user.name
                     break
                 }
             }
 
-        adapter = ProfileAdapter(this, listPostUser, object : OnClickImage {
-            override fun click(id: String) {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.other_activity, ImageFragment(id), null)
-                    .commit()
-            }
-
-        })
+        adapter = ProfileAdapter(
+            this,
+            listPostUser,
+            object : OnClickImage {
+                override fun click(id: String) {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.other_activity, ImageFragment(id), null)
+                        .commit()
+                }
+            },
+        )
 
         val query: Query = FirebaseFirestore.getInstance().collection("posts")
             .orderBy("time", Query.Direction.DESCENDING)
@@ -88,15 +91,14 @@ class OtherUserProfile : AppCompatActivity() {
                         adapter.notifyDataSetChanged()
                     }
                 }
-                postCount.text = "${listPostUser.size}"
+                binding.postCount.text = "${listPostUser.size}"
                 listenerRegistration.remove()
-            })
+            },
+        )
 
-
-        recyclerViewOtherProfile.setHasFixedSize(true)
-        recyclerViewOtherProfile.layoutManager = GridLayoutManager(this, 3);
-        recyclerViewOtherProfile.adapter = adapter
-
+        binding.recyclerViewOtherProfile.setHasFixedSize(true)
+        binding.recyclerViewOtherProfile.layoutManager = GridLayoutManager(this, 3)
+        binding.recyclerViewOtherProfile.adapter = adapter
 
         val idCurrent = FirebaseAuth.getInstance().uid
 
@@ -107,20 +109,20 @@ class OtherUserProfile : AppCompatActivity() {
                         if (snapshot != null) {
                             check = snapshot.exists()
                             if (check) {
-                                buttonFollow.setTextColor(Color.BLACK)
-                                buttonFollow.setBackgroundColor(Color.WHITE)
-                                buttonFollow.text = "Followed"
+                                binding.buttonFollow.setTextColor(Color.BLACK)
+                                binding.buttonFollow.setBackgroundColor(Color.WHITE)
+                                binding.buttonFollow.text = "Followed"
                             } else {
-                                buttonFollow.setTextColor(Color.WHITE)
-                                buttonFollow.setBackgroundColor(androidx.cardview.R.color.cardview_dark_background)
-                                buttonFollow.text = "Follow"
+                                binding.buttonFollow.setTextColor(Color.WHITE)
+                                binding.buttonFollow.setBackgroundColor(androidx.cardview.R.color.cardview_dark_background)
+                                binding.buttonFollow.text = "Follow"
                             }
                         }
                     }
                 }
         }
 
-        buttonFollow.setOnClickListener {
+        binding.buttonFollow.setOnClickListener {
             if (!check) {
                 FirebaseFirestore.getInstance().collection("users/$idCurrent/following").get()
                     .addOnCompleteListener { _ ->
@@ -133,7 +135,7 @@ class OtherUserProfile : AppCompatActivity() {
                                 .set(followerTime)
                         }
                     }
-                //check = true
+                // check = true
 
                 FirebaseFirestore.getInstance().collection("users/$id/follower").get()
                     .addOnCompleteListener { _ ->
@@ -155,10 +157,9 @@ class OtherUserProfile : AppCompatActivity() {
                     FirebaseFirestore.getInstance().collection("users/$id/follower")
                         .document(idCurrent).delete()
                 }
-                //check = false
+                // check = false
             }
         }
-
 
         if (id != null) {
             FirebaseFirestore.getInstance().collection("users/$idCurrent/send_request").document(id)
@@ -167,20 +168,19 @@ class OtherUserProfile : AppCompatActivity() {
                         if (snapshot != null) {
                             checkRequest = snapshot.exists()
                             if (!checkRequest) {
-                                addFriend.setImageResource(R.drawable.ic_baseline_person_add_alt_1_24)
-                                //cardViewAddFriend.setBackgroundColor(Color.WHITE)
+                                binding.addFriend.setImageResource(R.drawable.ic_baseline_person_add_alt_1_24)
+                                // cardViewAddFriend.setBackgroundColor(Color.WHITE)
                             } else {
-                                addFriend.setImageResource(R.drawable.ic_baseline_person_add_disabled_24)
-                                //cardViewAddFriend.setBackgroundColor(Color.BLACK)
+                                binding.addFriend.setImageResource(R.drawable.ic_baseline_person_add_disabled_24)
+                                // cardViewAddFriend.setBackgroundColor(Color.BLACK)
                             }
                         }
                     }
                 }
         }
 
-        addFriend.setOnClickListener {
-
-            if(!checkRequest) {
+        binding.addFriend.setOnClickListener {
+            if (!checkRequest) {
                 FirebaseFirestore.getInstance().collection("users/$idCurrent/send_request").get()
                     .addOnCompleteListener { _ ->
                         val timeRequest: MutableMap<String, Any> = HashMap()
@@ -205,8 +205,7 @@ class OtherUserProfile : AppCompatActivity() {
                                 .set(timeRequest)
                         }
                     }
-            }
-            else {
+            } else {
                 if (id != null) {
                     FirebaseFirestore.getInstance().collection("users/$idCurrent/send_request")
                         .document(id).delete()
@@ -218,7 +217,7 @@ class OtherUserProfile : AppCompatActivity() {
             }
         }
 
-        buttonMessage.setOnClickListener {
+        binding.buttonMessage.setOnClickListener {
             val intent = Intent(this, SpecificChat::class.java)
 
             if (id != null) {
@@ -227,13 +226,15 @@ class OtherUserProfile : AppCompatActivity() {
                         if (document != null) {
                             val user = document.toObject(User::class.java)
                             if (user != null) {
-                                FirebaseFirestore.getInstance().collection("users/$idCurrent/message").get()
+                                FirebaseFirestore.getInstance()
+                                    .collection("users/$idCurrent/message").get()
                                     .addOnCompleteListener { _ ->
                                         val timeRequest: MutableMap<String, Any> = HashMap()
                                         timeRequest["id"] = id.toString()
                                         timeRequest["timestamp"] = FieldValue.serverTimestamp()
-                                        timeRequest["timeseen"] =  "0"
-                                        FirebaseFirestore.getInstance().collection("users/$idCurrent/message")
+                                        timeRequest["timeseen"] = "0"
+                                        FirebaseFirestore.getInstance()
+                                            .collection("users/$idCurrent/message")
                                             .document(id)
                                             .set(timeRequest)
                                     }
@@ -247,7 +248,6 @@ class OtherUserProfile : AppCompatActivity() {
                     .addOnFailureListener {
                     }
             }
-
         }
     }
 }

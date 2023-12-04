@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
@@ -17,13 +18,10 @@ import com.example.blogandchat.OnClickImage
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.AddPostActivity
 import com.example.blogandchat.adapter.PostAdapter
+import com.example.blogandchat.databinding.FragmentHomeBinding
 import com.example.blogandchat.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.fragment_home.view.*
-import kotlinx.android.synthetic.main.nav_header_layout.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,6 +41,8 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: PostAdapter
     private val postList: MutableList<Post> = ArrayList()
     private lateinit var listenerRegistration: ListenerRegistration
+    private lateinit var binding: FragmentHomeBinding
+
 
     //private val viewModel by navGraphViewModels<HomeViewModel>(R.id.mobile_navigation)
 
@@ -52,7 +52,8 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_home,container, false)
+        return binding.root
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -61,7 +62,7 @@ class HomeFragment : Fragment() {
 
 
 
-        floatingActionButton.setOnClickListener(View.OnClickListener {
+        binding.floatingActionButton.setOnClickListener(View.OnClickListener {
             startActivity(
                 Intent(
                     context,
@@ -71,7 +72,7 @@ class HomeFragment : Fragment() {
         })
 
         if (FirebaseAuth.getInstance().currentUser != null) {
-            view.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
                     val isBottom = !recyclerView.canScrollVertically(1)
@@ -113,9 +114,9 @@ class HomeFragment : Fragment() {
             })
         }!!
 
-        recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.adapter = adapter
 
 //        if (viewModel.listState != null){
 //            recyclerView.layoutManager?.onRestoreInstanceState(viewModel.listState)

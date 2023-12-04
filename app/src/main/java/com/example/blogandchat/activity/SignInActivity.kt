@@ -5,16 +5,18 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import com.example.blogandchat.R
-import kotlinx.android.synthetic.main.activity_sign_in.*
+import com.example.blogandchat.databinding.ActivitySignInBinding
 
 class SignInActivity : AppCompatActivity() {
 
     private val viewModel: SignInViewModel by viewModels()
+    private lateinit var binding: ActivitySignInBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_in)
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_sign_in)
 
         viewModel.uiState.observe(this) { uiState ->
             uiState?.let {
@@ -34,12 +36,12 @@ class SignInActivity : AppCompatActivity() {
             }
         }
 
-        button_sign_in.setOnClickListener {
+        binding.buttonSignIn.setOnClickListener {
             //userSignIn()
-            viewModel.userSignIn(edt_sign_in_name.text.toString().trim(), edt_sign_in_pass.text.toString().trim())
+            viewModel.userSignIn(binding.edtSignInName.text.toString().trim(), binding.edtSignInPass.text.toString().trim())
         }
 
-        sign_up_text.setOnClickListener {
+        binding.signUpText.setOnClickListener {
             startActivity(Intent(this, SignUpActivity::class.java))
         }
 

@@ -2,17 +2,17 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
-    id 'kotlin-android-extensions'
     id 'kotlin-kapt'
+    id ("kotlin-parcelize")
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.blogandchat"
         minSdk 29
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -28,6 +28,8 @@ android {
 
     buildFeatures {
         viewBinding = true
+        dataBinding true
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -71,4 +73,16 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.firebase:firebase-messaging:23.0.6'
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
+
+    //EncryptSharePreference
+    implementation("androidx.security:security-crypto:1.0.0")
+
+    // For Identity Credential APIs
+    implementation("androidx.security:security-identity-credential:1.0.0-alpha03")
+
+    // For App Authentication APIs
+    implementation("androidx.security:security-app-authenticator:1.0.0-alpha02")
+
+    // For App Authentication API testing
+    androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha01")
 }

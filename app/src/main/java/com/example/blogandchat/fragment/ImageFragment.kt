@@ -5,10 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
-import kotlinx.android.synthetic.main.fragment_image.view.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -48,9 +49,11 @@ class ImageFragment() : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        context?.let { Glide.with(it.applicationContext).load(id).into(view.img_fragment) }
+        val img = view.findViewById<ImageView>(R.id.img_fragment)
+        val backImgBtn = view.findViewById<ImageButton>(R.id.backImgBtn)
+        context?.let { Glide.with(it.applicationContext).load(id).into(img) }
 
-        view.backImgBtn.setOnClickListener {
+        backImgBtn.setOnClickListener {
             val transaction = fragmentManager?.beginTransaction()
             if (transaction != null) {
                 transaction.remove(this)

@@ -9,8 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.R
 import com.example.blogandchat.model.Message
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.receive_chat_layout.view.*
-import kotlinx.android.synthetic.main.send_chat_layout.view.*
 
 class MessageAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -69,13 +67,13 @@ class MessageAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
     inner class SenderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvMessage: TextView = itemView.send_message
-        var timeOfMessage: TextView = itemView.time_message_send
+        val tvMessage: TextView = itemView.findViewById(R.id.send_message)
+        var timeOfMessage: TextView = itemView.findViewById(R.id.time_message_send)
     }
 
     inner class ReceiverViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvMessage: TextView = itemView.receive_message
-        var timeOfMessage: TextView = itemView.time_message_receive
+        val tvMessage: TextView = itemView.findViewById(R.id.receive_message)
+        var timeOfMessage: TextView = itemView.findViewById(R.id.time_message_receive)
     }
 
 

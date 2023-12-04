@@ -1,26 +1,24 @@
 package com.example.blogandchat.activity
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import com.example.blogandchat.R
-import com.example.blogandchat.firebase.FireStore
-import com.example.blogandchat.model.User
+import com.example.blogandchat.databinding.ActivitySignUpBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import kotlinx.android.synthetic.main.activity_sign_up.*
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
 
     private val viewModel: SignUpViewModel by viewModels()
+    private lateinit var binding: ActivitySignUpBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_up)
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_sign_up)
         firebaseAuth = FirebaseAuth.getInstance()
 
         viewModel.uiState.observe(this) { uiState ->
@@ -43,11 +41,11 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
-        button_sign_up.setOnClickListener {
-            viewModel.userSignUp(edt_sign_up_name.text.toString().trim(), edt_sign_up_pass.text.toString().trim())
+        binding.buttonSignUp.setOnClickListener {
+            viewModel.userSignUp(binding.edtSignUpName.text.toString().trim(), binding.edtSignUpPass.text.toString().trim())
         }
 
-        sign_in_text.setOnClickListener {
+        binding.signInText.setOnClickListener {
             startActivity(Intent(this, SignInActivity::class.java))
         }
 

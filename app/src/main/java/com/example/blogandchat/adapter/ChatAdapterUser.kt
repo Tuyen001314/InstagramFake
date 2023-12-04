@@ -17,7 +17,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.ServerTimestamp
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.android.synthetic.main.view_chat_layout_user.view.*
 
 class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>() {
     private lateinit var listUser: MutableList<User>
@@ -110,10 +109,10 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
     }
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameOfUser: TextView = itemView.nameOfUser1
-        val statusOfUser: CircleImageView = itemView.viewStatus
-        val avatar: CircleImageView = itemView.cardviewOfUser1
-        val lastMessage: TextView = itemView.statusOfUser
+        val nameOfUser: TextView = itemView.findViewById(R.id.nameOfUser1)
+        val statusOfUser: CircleImageView = itemView.findViewById(R.id.viewStatus)
+        val avatar: CircleImageView = itemView.findViewById(R.id.cardviewOfUser1)
+        val lastMessage: TextView = itemView.findViewById(R.id.statusOfUser)
 
     }
 

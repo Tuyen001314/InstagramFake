@@ -1,15 +1,16 @@
 package com.example.blogandchat.activity
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.CommentAdapter
+import com.example.blogandchat.databinding.ActivityCommentBinding
 import com.example.blogandchat.model.Comments
 import com.google.firebase.firestore.*
-import kotlinx.android.synthetic.main.activity_comment.*
 
 class CommentActivity : AppCompatActivity() {
 
@@ -18,23 +19,21 @@ class CommentActivity : AppCompatActivity() {
     private lateinit var idUserComment: String
     private lateinit var listenerRegistration: ListenerRegistration
     private var listComments: MutableList<Comments> = ArrayList()
-
-
-
+    lateinit var binding: ActivityCommentBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_comment)
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_comment)
 
         postCommment = intent.getStringExtra("id").toString()
         idUserComment = intent.getStringExtra("userId").toString()
 
         getDataComment()
 
-        btn_add_omment.setOnClickListener {
-            if (edt_comment.text != null) {
+        binding.btnAddOmment.setOnClickListener {
+            if (binding.edtComment.text != null) {
                 val commentsMap: MutableMap<String, Any> = HashMap()
                 commentsMap["user"] = idUserComment
-                commentsMap["comment"] = edt_comment.text.toString()
+                commentsMap["comment"] = binding.edtComment.text.toString()
                 commentsMap["timestamp"] = FieldValue.serverTimestamp()
                 if (postCommment != null) {
                     val ref = FirebaseFirestore.getInstance()
@@ -45,21 +44,22 @@ class CommentActivity : AppCompatActivity() {
                             finish()
                             startActivity(mIntent)
                         }
-                        .addOnFailureListener { Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show()}
+                        .addOnFailureListener {
+                            Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show()
+                        }
                 }
             } else {
                 Toast.makeText(
                     this,
                     "ban can nhap comment truoc",
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 ).show()
             }
         }
-        adapter = CommentAdapter(this, listComments, postCommment);
-        recycler_comments.layoutManager = LinearLayoutManager(this)
-        recycler_comments.setHasFixedSize(true)
-        recycler_comments.adapter = adapter
-
+        adapter = CommentAdapter(this, listComments, postCommment)
+        binding.recyclerComments.layoutManager = LinearLayoutManager(this)
+        binding.recyclerComments.setHasFixedSize(true)
+        binding.recyclerComments.adapter = adapter
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -71,7 +71,8 @@ class CommentActivity : AppCompatActivity() {
                 for (doc in value!!.documentChanges) {
                     if (doc.type == DocumentChange.Type.ADDED) {
                         val commentsId = doc.document.id
-                        val comments: Comments = doc.document.toObject(Comments::class.java).withId(commentsId)
+                        val comments: Comments =
+                            doc.document.toObject(Comments::class.java).withId(commentsId)
                         listComments.add(comments)
                         adapter.notifyDataSetChanged()
                     } else {
@@ -79,10 +80,11 @@ class CommentActivity : AppCompatActivity() {
                     }
                 }
                 listenerRegistration.remove()
-            })
+            },
+        )
     }
 }
-//else {
+// else {
 //                            if (postCommment != null) {
 //                                FirebaseFirestore.getInstance()
 //                                    .collection("posts/$postCommment/comments")
@@ -90,4 +92,4 @@ class CommentActivity : AppCompatActivity() {
 //                            }
 //        }
 //    }
-//}
+// }

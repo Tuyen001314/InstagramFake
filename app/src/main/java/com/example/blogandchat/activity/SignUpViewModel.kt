@@ -18,20 +18,20 @@ class SignUpViewModel : ViewModel() {
                                 password = pass,
                                 result = true,
                                 check = true,
-                                id = taskId.result!!.user!!.uid
-                            )
+                                id = taskId.result!!.user!!.uid,
+                            ),
                         )
                     } else {
                         uiState.postValue(
                             SignUpUiState(
                                 result = false,
-                            )
+                            ),
                         )
                     }
                 }
         } else {
             uiState.postValue(
-                SignUpUiState(check = false)
+                SignUpUiState(check = false),
             )
         }
     }
@@ -42,5 +42,5 @@ data class SignUpUiState(
     val password: String? = null,
     val result: Boolean? = false,
     val check: Boolean? = false,
-    val id: String? = null
+    val id: String? = null,
 )

@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.Build
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.blogandchat.OnClickImage
@@ -26,7 +24,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.android.synthetic.main.each_post.view.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -237,15 +234,14 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     class ViewHolder(itemView: View, private val onClickImage: OnClickImage) :
         RecyclerView.ViewHolder(itemView) {
 
-        val likeImage: ImageView = itemView.img_view_like
-        private val mView: View = itemView
-        val caption: TextView = itemView.tv_caption
-        val userName: TextView = itemView.tv_username
-        val date: TextView = itemView.tv_date
-        val postPic: ImageView = itemView.user_post
-        val profilePic: CircleImageView = itemView.profile_pic
-        val deletePost: ImageView = itemView.image_button_delete
-        val commentPost: ImageView = itemView.img_view_comment
+        val likeImage: ImageView = itemView.findViewById(R.id.img_view_like)
+        val caption: TextView = itemView.findViewById(R.id.tv_caption)
+        var userName: TextView = itemView.findViewById(R.id.tv_username)
+        val date: TextView = itemView.findViewById(R.id.tv_date)
+        val postPic: ImageView = itemView.findViewById(R.id.user_post)
+        val profilePic: CircleImageView = itemView.findViewById(R.id.profile_pic)
+        val deletePost: ImageView = itemView.findViewById(R.id.image_button_delete)
+        val commentPost: ImageView = itemView.findViewById(R.id.img_view_comment)
 
 //        fun setPostLikes(count: Int) {
 //            val postLikes = mView.tv_count_like
@@ -260,18 +256,15 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
         }
 
         fun setPostUsername(username: String?) {
-            val postUsername = itemView.tv_username
-            postUsername.text = username
+            this.userName.text = username
         }
 
         fun setPostDate(date: String?) {
-            val postDate = itemView.tv_date
-            postDate.text = date
+          this.date.text = date
         }
 
         fun setPostCaption(caption: String?) {
-            val postCaption = itemView.tv_caption
-            postCaption.text = caption
+           this.caption.text = caption
         }
     }
 }

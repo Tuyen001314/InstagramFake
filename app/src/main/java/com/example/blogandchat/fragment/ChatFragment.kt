@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.Toast
@@ -17,9 +18,6 @@ import com.example.blogandchat.adapter.ChatAdapterUser
 import com.example.blogandchat.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_chat.*
-import kotlinx.android.synthetic.main.fragment_chat.view.*
-
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,12 +41,13 @@ class ChatFragment : Fragment() {
     private lateinit var adapter: ChatAdapter
     private lateinit var adapterUser: ChatAdapterUser
 
-    //private lateinit var listenerRegistration: ListenerRegistration
+    // private lateinit var listenerRegistration: ListenerRegistration
     private lateinit var linearLayoutManager: LinearLayoutManager
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_chat, container, false)
@@ -58,13 +57,14 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.recyclerViewChat
-        recyclerView1 = view.recyclerViewChat1
+        recyclerView = view.findViewById(R.id.recyclerViewChat)
+        recyclerView1 = view.findViewById(R.id.recyclerViewChat1)
+        val searchChat: SearchView = view.findViewById(R.id.searchChat)
 
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseFirestore = FirebaseFirestore.getInstance()
 
-        val id = firebaseAuth.uid;
+        val id = firebaseAuth.uid
         firebaseFirestore.collection("users/$id/message")
             .get().addOnSuccessListener { documents ->
                 for (document in documents) {
@@ -82,7 +82,6 @@ class ChatFragment : Fragment() {
                 }
             }
 
-
         adapter = activity?.let { ChatAdapter(it, list) }!!
         recyclerView.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
@@ -99,7 +98,8 @@ class ChatFragment : Fragment() {
         recyclerView1.adapter = adapterUser
         adapterUser.notifyDataSetChanged()
 
-        searchChat.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+        searchChat.setOnQueryTextListener(object :
+            SearchView.OnQueryTextListener,
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 return false
@@ -112,7 +112,6 @@ class ChatFragment : Fragment() {
                 return false
             }
         })
-
     }
 
     private fun filter(text: String) {

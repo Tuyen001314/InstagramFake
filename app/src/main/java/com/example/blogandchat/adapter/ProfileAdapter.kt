@@ -12,7 +12,6 @@ import com.example.blogandchat.R
 import com.example.blogandchat.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.each_post_user.view.*
 import java.security.spec.PSSParameterSpec
 
 class ProfileAdapter(): RecyclerView.Adapter<ProfileAdapter.ViewHolder>() {
@@ -47,7 +46,7 @@ class ProfileAdapter(): RecyclerView.Adapter<ProfileAdapter.ViewHolder>() {
     }
 
     class ViewHolder(itemView: View, private val onClickImage: OnClickImage) : RecyclerView.ViewHolder(itemView) {
-        val imagePost: ImageView = itemView.user_post_image
+        val imagePost: ImageView = itemView.findViewById(R.id.user_post_image)
 
         fun bindData(id: String) {
             imagePost.setOnClickListener {

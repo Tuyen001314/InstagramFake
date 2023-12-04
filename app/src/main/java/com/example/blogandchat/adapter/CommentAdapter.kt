@@ -19,7 +19,6 @@ import com.example.blogandchat.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.android.synthetic.main.comment_post.view.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -32,7 +31,7 @@ class CommentAdapter() : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
     constructor(
         context: Context,
         listComments: MutableList<Comments>,
-        postComments: String
+        postComments: String,
     ) : this() {
         this.listComments = listComments
         this.context = context
@@ -131,11 +130,11 @@ class CommentAdapter() : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View, private val postComments: String) :
         RecyclerView.ViewHolder(itemView) {
-        val imageUserComment: CircleImageView = itemView.circleImageView_comment
-        val nameUserComment: TextView = itemView.tv_user_comment
-        val commentOfUser: TextView = itemView.comment_tv
-        val timeComment: TextView = itemView.timeComment
-        val eraseComment: ImageButton = itemView.imag_btn_delete_comment
+        val imageUserComment: CircleImageView = itemView.findViewById(R.id.circleImageView_comment)
+        val nameUserComment: TextView = itemView.findViewById(R.id.tv_user_comment)
+        val commentOfUser: TextView = itemView.findViewById(R.id.comment_tv)
+        val timeComment: TextView = itemView.findViewById(R.id.timeComment)
+        val eraseComment: ImageButton = itemView.findViewById(R.id.imag_btn_delete_comment)
 
 
     }

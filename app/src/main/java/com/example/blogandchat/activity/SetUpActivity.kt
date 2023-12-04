@@ -8,24 +8,25 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
+import com.example.blogandchat.databinding.ActivitySetUpBinding
 import com.example.blogandchat.firebase.FireStore
-import kotlinx.android.synthetic.main.activity_set_up.*
 
 class SetUpActivity : AppCompatActivity() {
     private val REQUEST_CODE = 100
 
     private val viewModel: SetUpViewModel by viewModels()
-
+    private lateinit var binding: ActivitySetUpBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_set_up)
+       binding = DataBindingUtil.setContentView(this,R.layout.activity_set_up)
 
         viewModel.uiState.observe(this) { uiState ->
             uiState?.let {
-                Glide.with(this).load(uiState.uri).into(circleImageView)
-                progressBar.isVisible = uiState.addingUser
+                Glide.with(this).load(uiState.uri).into(binding.circleImageView)
+                binding.progressBar.isVisible = uiState.addingUser
 
                 if (uiState.addError) {
                     Toast.makeText(
@@ -44,17 +45,17 @@ class SetUpActivity : AppCompatActivity() {
             }
         }
 
-        circleImageView.setOnClickListener {
+        binding.circleImageView.setOnClickListener {
             openGalleryForImage()
         }
 
-        btn_save.setOnClickListener {
-            progressBar.visibility = View.VISIBLE
+        binding.btnSave.setOnClickListener {
+            binding.progressBar.visibility = View.VISIBLE
 
             viewModel.addUser(
                 intent.getStringExtra("id").toString(),
                 intent.getStringExtra("email").toString(),
-                edt_name_enter.text.toString().trim()
+                binding.edtNameEnter.text.toString().trim()
             )
         }
     }

@@ -12,7 +12,6 @@ import com.example.blogandchat.R
 import com.example.blogandchat.model.Video
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
-import kotlinx.android.synthetic.main.each_video.view.*
 
 
 class VideoAdapter(options: FirebaseRecyclerOptions<Video>) : FirebaseRecyclerAdapter<Video, VideoAdapter.ViewHolder>(
@@ -30,7 +29,7 @@ class VideoAdapter(options: FirebaseRecyclerOptions<Video>) : FirebaseRecyclerAd
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val video: VideoView = itemView.videoView
+        val video: VideoView = itemView.findViewById(R.id.videoView)
 
         fun setData(obj: Video) {
             video.setVideoPath(obj.videoUrl)

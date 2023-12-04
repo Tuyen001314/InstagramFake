@@ -11,8 +11,6 @@ import com.example.blogandchat.adapter.VideoAdapter
 import com.example.blogandchat.model.Video
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.android.synthetic.main.fragment_search.*
-
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +24,8 @@ private const val ARG_PARAM2 = "param2"
  */
 class SearchFragment : Fragment() {
 
-    private lateinit var adapter: VideoAdapter;
+    private lateinit var adapter: VideoAdapter
+
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -40,18 +39,18 @@ class SearchFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search, container, false)
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        val viewPager = view.findViewById<ViewPager2>(R.id.viewPager)
 //        val video = Video("abc")
 //        FirebaseDatabase.getInstance().reference.child("videos").push().setValue(video).addOnCompleteListener {  }
 
@@ -59,7 +58,7 @@ class SearchFragment : Fragment() {
             FirebaseRecyclerOptions.Builder<Video>()
                 .setQuery(
                     FirebaseDatabase.getInstance().reference.child("videos"),
-                    Video::class.java
+                    Video::class.java,
                 )
                 .build()
 
@@ -96,5 +95,4 @@ class SearchFragment : Fragment() {
                 }
             }
     }
-
 }

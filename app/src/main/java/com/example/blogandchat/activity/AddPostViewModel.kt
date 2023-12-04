@@ -15,7 +15,7 @@ class AddPostViewModel : ViewModel() {
     fun addPost(caption: String) {
         if (uiState.value?.uri == null) {
             uiState.postValue(
-                AddPostUiState(addError = false)
+                AddPostUiState(addError = false),
             )
             return
         }
@@ -39,8 +39,8 @@ class AddPostViewModel : ViewModel() {
                                 uri = null,
                                 addingPost = false,
                                 addPostSuccess = true,
-                                addError = true
-                            )
+                                addError = true,
+                            ),
                         )
                     }
                     .addOnFailureListener { e ->
@@ -49,8 +49,8 @@ class AddPostViewModel : ViewModel() {
                                 uri = null,
                                 addingPost = false,
                                 addPostSuccess = false,
-                                addError = true
-                            )
+                                addError = true,
+                            ),
                         )
                     }
             }
@@ -59,16 +59,15 @@ class AddPostViewModel : ViewModel() {
 
     fun getImage(uri: Uri) {
         uiState.postValue(
-            AddPostUiState(uri = uri)
+            AddPostUiState(uri = uri),
         )
     }
 }
-
 
 data class AddPostUiState(
     val uri: Uri? = null,
     val caption: String = "",
     val addingPost: Boolean = false,
     val addPostSuccess: Boolean = false,
-    val addError: Boolean = true
+    val addError: Boolean = true,
 )

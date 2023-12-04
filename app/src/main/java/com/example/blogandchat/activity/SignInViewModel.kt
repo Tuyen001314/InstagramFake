@@ -2,7 +2,10 @@ package com.example.blogandchat.activity
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 
 class SignInViewModel : ViewModel() {
     val uiState = MutableLiveData<SignInUiState>()
@@ -17,8 +20,8 @@ class SignInViewModel : ViewModel() {
                                 email = email,
                                 password = pass,
                                 result = true,
-                                check = true
-                            )
+                                check = true,
+                            ),
                         )
                     } else {
                         uiState.postValue(
@@ -26,23 +29,22 @@ class SignInViewModel : ViewModel() {
                                 email = email,
                                 password = pass,
                                 result = false,
-                                check = true
-                            )
+                                check = true,
+                            ),
                         )
                     }
                 }
         } else {
             uiState.postValue(
-                SignInUiState(check = false)
+                SignInUiState(check = false),
             )
         }
     }
-
 }
 
 data class SignInUiState(
     val email: String? = null,
     val password: String? = null,
     val result: Boolean? = false,
-    val check: Boolean? = false
+    val check: Boolean? = false,
 )

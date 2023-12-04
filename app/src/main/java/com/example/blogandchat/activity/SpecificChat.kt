@@ -5,24 +5,18 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
-import com.example.blogandchat.RetrofitInstance
 import com.example.blogandchat.adapter.MessageAdapter
+import com.example.blogandchat.databinding.ActivitySpecificChatBinding
 import com.example.blogandchat.model.Message
-import com.example.blogandchat.model.NotificationData
-import com.example.blogandchat.model.PushNotification
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_specific_chat.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,17 +26,18 @@ class SpecificChat : AppCompatActivity() {
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private var messageList: MutableList<Message> = ArrayList()
     private lateinit var messagesAdapter: MessageAdapter
+    private lateinit var binding: ActivitySpecificChatBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(
+        binding = DataBindingUtil.setContentView(this,
             R.layout.activity_specific_chat)
 
 
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.stackFromEnd = true
         linearLayoutManager.orientation = RecyclerView.VERTICAL
-        recycle_chat.layoutManager = linearLayoutManager
+        binding.recycleChat.layoutManager = linearLayoutManager
 
         val calendar = Calendar.getInstance()
         val simpleDateFormat = SimpleDateFormat("hh:mm a")
@@ -87,21 +82,21 @@ class SpecificChat : AppCompatActivity() {
 
         databaseReference.addValueEventListener(postListener)
 
-        recycle_chat.adapter = messagesAdapter
+        binding.recycleChat.adapter = messagesAdapter
 
-        image_btn_chat.setOnClickListener(View.OnClickListener { finish() })
+        binding.imageBtnChat.setOnClickListener(View.OnClickListener { finish() })
 
-        tv_username_chat.text = mReceiverName
+        binding.tvUsernameChat.text = mReceiverName
 
         val uri = intent.getStringExtra("imageuri")
         if (uri!!.isEmpty()) {
             Toast.makeText(applicationContext, "null is received", Toast.LENGTH_SHORT).show()
         } else {
-            Glide.with(this).load(uri).into(image_user_chat)
+            Glide.with(this).load(uri).into(binding.imageUserChat)
         }
 
-        image_btn_chat.setOnClickListener(View.OnClickListener {
-            val enterdMessage = edt_chat.text.toString()
+        binding.imageBtnChat.setOnClickListener(View.OnClickListener {
+            val enterdMessage = binding.edtChat.text.toString()
             if (enterdMessage.isEmpty()) {
                 Toast.makeText(applicationContext, "Enter meassage first", Toast.LENGTH_SHORT)
                     .show()
@@ -140,7 +135,7 @@ class SpecificChat : AppCompatActivity() {
 //                        }
                     })
 
-                edt_chat.text = null
+                binding.edtChat.text = null
             }
         })
     }

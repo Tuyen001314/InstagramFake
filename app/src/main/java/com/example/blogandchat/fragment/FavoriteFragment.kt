@@ -2,23 +2,19 @@ package com.example.blogandchat.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.R
-import com.example.blogandchat.adapter.ChatAdapter
 import com.example.blogandchat.adapter.FavoriteAdapter
-import com.example.blogandchat.adapter.PostAdapter
 import com.example.blogandchat.adapter.SuggestFavoriteAdapter
-import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.android.synthetic.main.fragment_favorite.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -41,17 +37,20 @@ class FavoriteFragment : Fragment() {
     private lateinit var linearLayoutManager: LinearLayoutManager
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_favorite, container, false)
     }
 
-
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val listSuggest = view.findViewById<RecyclerView>(R.id.listSuggest)
+        val listRequest = view.findViewById<RecyclerView>(R.id.listRequest)
+
 
         val id = FirebaseAuth.getInstance().uid
         FirebaseFirestore.getInstance().collection("users/$id/receive_request")
@@ -71,7 +70,6 @@ class FavoriteFragment : Fragment() {
                 }
             }
 
-
         adapter = activity?.let { FavoriteAdapter(it, listFavorite) }!!
         listRequest.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
@@ -80,23 +78,22 @@ class FavoriteFragment : Fragment() {
         listRequest.adapter = adapter
         adapter.notifyDataSetChanged()
 
-
         FirebaseFirestore.getInstance().collection("users").whereNotEqualTo("id", id)
             .get().addOnSuccessListener { documents ->
                 for (document in documents) {
                     // val firebaseModel =
                     val idUserReceive = document.id
-                    //listFavoriteSuggest.add(document.toObject(User::class.java))
-                   // adapterSuggest.notifyDataSetChanged()
-                    FirebaseFirestore.getInstance().collection("users/$id/following").document(idUserReceive)
+                    // listFavoriteSuggest.add(document.toObject(User::class.java))
+                    // adapterSuggest.notifyDataSetChanged()
+                    FirebaseFirestore.getInstance().collection("users/$id/following")
+                        .document(idUserReceive)
                         .get().addOnSuccessListener { doc ->
-                            if(!doc.exists()) {
+                            if (!doc.exists()) {
                                 listFavoriteSuggest.add(document.toObject(User::class.java))
                                 adapterSuggest.notifyDataSetChanged()
                             }
                         }
                         .addOnFailureListener {
-
                         }
                 }
             }
@@ -108,7 +105,5 @@ class FavoriteFragment : Fragment() {
         listSuggest.layoutManager = linearLayoutManager
         listSuggest.adapter = adapterSuggest
         adapterSuggest.notifyDataSetChanged()
-
-
     }
 }

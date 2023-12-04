@@ -21,8 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.android.synthetic.main.item_favorite.view.*
-import kotlinx.android.synthetic.main.view_chat_layout.view.*
+
 import java.util.HashMap
 
 class FavoriteAdapter() : RecyclerView.Adapter<FavoriteAdapter.ViewHolder?>() {
@@ -86,10 +85,10 @@ class FavoriteAdapter() : RecyclerView.Adapter<FavoriteAdapter.ViewHolder?>() {
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameOfUser: TextView = itemView.nameOfUser1
-        val avatar: CircleImageView = itemView.cardviewOfUser1
-        val accept: Button = itemView.buttonAccept
-        val erase: ImageView = itemView.eraseRequest
+        val nameOfUser: TextView = itemView.findViewById(R.id.nameOfUser1)
+        val avatar: CircleImageView = itemView.findViewById(R.id.cardviewOfUser1)
+        val accept: Button = itemView.findViewById(R.id.buttonAccept)
+        val erase: ImageView = itemView.findViewById(R.id.eraseRequest)
     }
 
 }
