@@ -42,9 +42,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         docRef.update("status", "online").addOnSuccessListener { }
 
         docRef.get().addOnSuccessListener { documentSnapshot ->
-            user = documentSnapshot.toObject<com.example.blogandchat.model.User>()!!
-            navUserName.text = user.name
-            Glide.with(this).load(user.image).into(navImgUser)
+            user = documentSnapshot.toObject<User>()!!
+            /*navUserName.text = user.name
+            Glide.with(this).load(user.image).into(navImgUser)*/
         }
 
         loadFragment(HomeFragment())
