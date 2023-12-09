@@ -37,7 +37,7 @@ class ChatAdapter() : RecyclerView.Adapter<ChatAdapter.NoteViewHolder?>() {
         if (firebaseModel.status == "online") {
             holder.statusOfUser.visibility = View.VISIBLE
         } else {
-            holder.statusOfUser.visibility = View.VISIBLE
+            holder.statusOfUser.visibility = View.INVISIBLE
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener { v ->

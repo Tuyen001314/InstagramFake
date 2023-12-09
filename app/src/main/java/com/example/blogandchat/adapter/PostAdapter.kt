@@ -5,46 +5,45 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.blogandchat.OnClickImage
+import com.example.blogandchat.PostDetailListener
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.CommentActivity
 import com.example.blogandchat.activity.OtherUserProfile
 import com.example.blogandchat.activity.SettingActivity
-import com.example.blogandchat.model.Post
+import com.example.blogandchat.model.PostDetailModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
-class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
-    lateinit var listPost: MutableList<Post>
-    lateinit var context: Context
+class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
+    ListAdapter<PostDetailModel, PostAdapter.ViewHolder>(object :
+        DiffUtil.ItemCallback<PostDetailModel>() {
+        override fun areItemsTheSame(oldItem: PostDetailModel, newItem: PostDetailModel): Boolean {
+            return oldItem.postId == newItem.postId
+        }
+
+        override fun areContentsTheSame(
+            oldItem: PostDetailModel,
+            newItem: PostDetailModel,
+        ): Boolean {
+            return oldItem.caption == newItem.caption && oldItem.isLiked == newItem.isLiked && oldItem.image == newItem.image
+        }
+
+    }) {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-
-    private lateinit var onClickImage: OnClickImage
-
-    constructor(
-        context: Context,
-        listPost: MutableList<Post>,
-        onClickImage: OnClickImage
-    ) : this() {
-        this.listPost = listPost
-        this.context = context
-        this.onClickImage = onClickImage
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View =
@@ -56,63 +55,27 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post: Post = listPost[position]
+        val post: PostDetailModel = getItem(position)
         Glide.with(context).load(post.image).into(holder.postPic)
 
         holder.bindData(post.image)
 
         holder.setPostCaption(post.caption)
 
-        val calendar = Calendar.getInstance().time
-        //val simpleDateFormat = SimpleDateFormat("hh:mm a")
-        val currentTime: Long = calendar.time
-        val milliseconds: Long = post.time!!.toDate().time
-
-        val a = currentTime - milliseconds
-
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(a)
-
-        if (minutes / 60 <= 24) {
-            if (minutes <= 0) holder.setPostDate("vài giây trước")
-            else {
-                if (minutes < 60) holder.setPostDate("$minutes phút trước")
-                else
-                    holder.setPostDate("${minutes / 60} giờ trước")
-            }
-        } else {
-            val date = DateFormat.format("MM/dd/yyyy", Date(milliseconds)).toString()
-            holder.setPostDate(date)
-        }
-
-        val userId: String = post.user
-        firestore.collection("users").document(userId).get().addOnCompleteListener { task ->
-
-            if (task.isSuccessful) {
-                val userName: String? = task.result.getString("name");
-                val image: String? = task.result.getString("image");
-                val idUser = task.result.getString("id");
-
-                holder.setPostUsername(userName)
-                Glide.with(context).load(image).into(holder.profilePic)
-                holder.userName.setOnClickListener {
-                    if(idUser != FirebaseAuth.getInstance().uid) {
-                        val intent = Intent(context, OtherUserProfile::class.java);
-                        intent.putExtra("id", idUser)
-                        context.startActivity(intent)
-                    }
-                    else {
-                        context.startActivity(Intent(context, SettingActivity::class.java))
-                    }
-                }
+        holder.setPostDate(post.timeForShow)
+        holder.setPostUsername(post.userName)
+        Glide.with(context).load(post.imageUser).into(holder.profilePic)
+        holder.userName.setOnClickListener {
+            if (!post.isYour) {
+                val intent = Intent(context, OtherUserProfile::class.java);
+                intent.putExtra("id", post.idUser)
+                context.startActivity(intent)
             } else {
-                Toast.makeText(context, task.exception.toString(), Toast.LENGTH_SHORT).show()
+                context.startActivity(Intent(context, SettingActivity::class.java))
             }
         }
 
-        val postId = post.postId
-        val idUser = FirebaseAuth.getInstance().uid
-
-        if (post.user == idUser) {
+        if (post.isYour) {
             holder.deletePost.visibility = View.VISIBLE
             holder.deletePost.setOnClickListener {
                 val dialogBuilder = AlertDialog.Builder(context)
@@ -124,7 +87,7 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
                     // positive button text and action
                     .setPositiveButton("Có", DialogInterface.OnClickListener { dialog, id ->
                         FirebaseFirestore.getInstance().collection("posts")
-                            .document("$postId").delete()
+                            .document("${post.postId}").delete()
                             .addOnSuccessListener {
                                 Toast.makeText(
                                     context,
@@ -154,84 +117,39 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
                 alert.show()
             }
 
-        }
-        else {
+        } else {
             holder.deletePost.visibility = View.INVISIBLE
         }
 
-        if (idUser != null) {
-            firestore.collection(
-                "posts/" +
-                        postId + "/likes"
-            ).document(idUser).addSnapshotListener { snapshot, e ->
-                if (e == null) {
-                    if (snapshot != null) {
-                        if (snapshot.exists()) {
-                            holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.affer_liked))
-                        } else {
-                            holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.heart_1))
-                        }
-                    }
-                }
-            }
+        if (post.isLiked) {
+            holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.affer_liked))
+        } else {
+            holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.heart_1))
         }
 
         holder.commentPost.setOnClickListener {
             val intent = Intent(context, CommentActivity::class.java)
-            intent.putExtra("id", postId)
+            intent.putExtra("id", post.postId)
             intent.putExtra("userId", FirebaseAuth.getInstance().uid)
             context.startActivity(intent)
         }
 
 
         holder.likeImage.setOnClickListener {
-            val ref = FirebaseAuth.getInstance().uid?.let { it1 ->
-                FirebaseFirestore.getInstance().collection(
-                    "posts/" +
-                            postId + "/likes"
-                ).document(it1).get().addOnCompleteListener { task ->
-
-                    if (!task.result.exists()) {
-                        val likesMap: MutableMap<String, Any> = HashMap()
-                        likesMap["timestamp"] = FieldValue.serverTimestamp()
-                        if (idUser != null) {
-                            firestore.collection("posts/$postId/likes").document(idUser)
-                                .set(likesMap)
-                        }
-                    } else {
-                        if (idUser != null) {
-                            firestore.collection("posts/$postId/likes").document(idUser).delete()
-                        }
-                    }
-
-                    FirebaseAuth.getInstance().uid?.let { it2 ->
-                        firestore.collection(
-                            "posts/" +
-                                    postId + "/likes"
-                        ).document(it2).addSnapshotListener { snapshot, e ->
-                            if (e == null) {
-                                if (snapshot != null) {
-                                    if (snapshot.exists()) {
-                                        holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.affer_liked))
-                                    } else {
-                                        holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.heart_1))
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if (!post.isLiked) {
+                post.isLiked = true
+                holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.affer_liked))
+            } else {
+                post.isLiked = false
+                holder.likeImage.setImageDrawable(context.getDrawable(R.drawable.heart_1))
             }
+            onClickImage.like(post.postId.toString())
+
         }
     }
 
 
-    override fun getItemCount(): Int {
-        return listPost.size
-    }
-
-
-    class ViewHolder(itemView: View, private val onClickImage: OnClickImage) :
+    class ViewHolder(itemView: View, private val onClickImage: PostDetailListener) :
         RecyclerView.ViewHolder(itemView) {
 
         val likeImage: ImageView = itemView.findViewById(R.id.img_view_like)
@@ -260,11 +178,11 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
         }
 
         fun setPostDate(date: String?) {
-          this.date.text = date
+            this.date.text = date
         }
 
         fun setPostCaption(caption: String?) {
-           this.caption.text = caption
+            this.caption.text = caption
         }
     }
 }

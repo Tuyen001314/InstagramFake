@@ -11,15 +11,16 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.blogandchat.OnClickImage
+import com.example.blogandchat.PostDetailListener
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.AddPostActivity
 import com.example.blogandchat.adapter.PostAdapter
 import com.example.blogandchat.databinding.FragmentHomeBinding
+import com.example.blogandchat.home.HomeViewModel
 import com.example.blogandchat.model.Post
+import com.example.blogandchat.model.PostDetailModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 
@@ -42,6 +43,7 @@ class HomeFragment : Fragment() {
     private val postList: MutableList<Post> = ArrayList()
     private lateinit var listenerRegistration: ListenerRegistration
     private lateinit var binding: FragmentHomeBinding
+    private val viewModel: HomeViewModel by viewModels()
 
 
     //private val viewModel by navGraphViewModels<HomeViewModel>(R.id.mobile_navigation)
@@ -49,19 +51,16 @@ class HomeFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_home,container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         return binding.root
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-
         binding.floatingActionButton.setOnClickListener(View.OnClickListener {
             startActivity(
                 Intent(
@@ -91,17 +90,15 @@ class HomeFragment : Fragment() {
                             val postId = doc.document.id
                             val post: Post = doc.document.toObject(Post::class.java).withId(postId)
                             postList.add(post)
-                            adapter.notifyDataSetChanged()
-                        } else {
-                            adapter.notifyDataSetChanged()
                         }
                     }
+                    viewModel.transferData(postList)
                     listenerRegistration.remove()
                 })
         }
 
         adapter = activity?.let {
-            PostAdapter(it, postList, object : OnClickImage {
+            PostAdapter(context = requireContext(), onClickImage = object : PostDetailListener {
                 override fun click(id: String) {
                     val transaction = fragmentManager?.beginTransaction()
                     if (transaction != null) {
@@ -111,6 +108,10 @@ class HomeFragment : Fragment() {
                         transaction.commit()
                     }
                 }
+
+                override fun like(id: String) {
+                    viewModel.likeImage(id)
+                }
             })
         }!!
 
@@ -118,6 +119,11 @@ class HomeFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
 
+
+        viewModel.postDetails.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+            adapter.notifyDataSetChanged()
+        }
 //        if (viewModel.listState != null){
 //            recyclerView.layoutManager?.onRestoreInstanceState(viewModel.listState)
 //            viewModel.listState = null
