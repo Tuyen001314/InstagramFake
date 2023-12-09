@@ -4,13 +4,13 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.blogandchat.model.User
+import com.example.blogandchat.utils.AppKey
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import java.util.*
 
 class SetUpViewModel : ViewModel() {
     val uiState = MutableLiveData<SetUpUiState>()
-
     fun addUser(id: String, email: String, name: String) {
         if (uiState.value?.uri == null) {
             uiState.postValue(
@@ -32,7 +32,8 @@ class SetUpViewModel : ViewModel() {
                         email = email,
                         name = name,
                         image = it.toString(),
-                        status = "online"
+                        status = "online",
+                        publicKey = AppKey.getPublicKey()
                     )
 
                     val myRef = FirebaseDatabase.getInstance().getReference("/users/$id")

@@ -10,13 +10,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.example.blogandchat.model.User
+import com.example.blogandchat.utils.Constants.USERS
 
 class FireStore {
 
     private val mFireStore = FirebaseFirestore.getInstance()
 
     fun registerUser(activity: SetUpActivity, userInfo: User) {
-        mFireStore.collection(Constants.USERS)
+        mFireStore.collection(USERS)
             .document(getCurrentUserId())
             .set(userInfo, SetOptions.merge())
             .addOnSuccessListener {
@@ -24,6 +25,14 @@ class FireStore {
             }.addOnFailureListener {
                 //e -> Log.e(activity.javaClass.simpleName, )
             }
+    }
+
+    fun updatePublicKeyUser(publicKey: String) {
+        val userRef = mFireStore.collection(USERS).document(getCurrentUserId())
+        val update = hashMapOf<String, Any>(
+            "publicKey" to publicKey
+        )
+        userRef.update(update)
     }
 
 //    fun signInUser(activity: SignInActivity) {
@@ -41,7 +50,7 @@ class FireStore {
 //    }
 
     fun getCurrentUserId(): String {
-        var currentUser = FirebaseAuth.getInstance().currentUser
+        val currentUser = FirebaseAuth.getInstance().currentUser
         var currentUserId = ""
         if (currentUser != null) {
             currentUserId = currentUser.uid

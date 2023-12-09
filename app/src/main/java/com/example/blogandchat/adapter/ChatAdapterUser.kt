@@ -13,6 +13,7 @@ import com.example.blogandchat.R
 import com.example.blogandchat.activity.SpecificChat
 import com.example.blogandchat.model.Message
 import com.example.blogandchat.model.User
+import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.ServerTimestamp
@@ -38,6 +39,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
 
         val firebaseModel: User = listUser[position]
+        AppKey.calculateKey(firebaseModel.publicKey.toString())
 
         Glide.with(context).load(firebaseModel.image).into(holder.avatar)
         holder.nameOfUser.text = firebaseModel.name
@@ -53,6 +55,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
             intent.putExtra("name", firebaseModel.name)
             intent.putExtra("receiveruid", firebaseModel.id)
             intent.putExtra("imageuri", firebaseModel.image)
+            intent.putExtra("publicKey", firebaseModel.publicKey)
             v.context.startActivity(intent)
         })
 
@@ -77,10 +80,10 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                 }
 
                 if (message.senderId == FirebaseAuth.getInstance().uid) {
-                    holder.lastMessage.text = "Bạn: " + message.message
+                    holder.lastMessage.text = "Bạn: " + AppKey.decrypt(message.message)
 
                 } else {
-                    holder.lastMessage.text = message.message
+                    holder.lastMessage.text = AppKey.decrypt(message.message)
                 }
             }
 
