@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
@@ -36,6 +37,9 @@ class OtherUserProfile : AppCompatActivity() {
     @SuppressLint("ResourceAsColor", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        supportActionBar?.hide()
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_other_user_profile)
 
         val id = intent.getStringExtra("id")
@@ -109,12 +113,8 @@ class OtherUserProfile : AppCompatActivity() {
                         if (snapshot != null) {
                             check = snapshot.exists()
                             if (check) {
-                                binding.buttonFollow.setTextColor(Color.BLACK)
-                                binding.buttonFollow.setBackgroundColor(Color.WHITE)
-                                binding.buttonFollow.text = "Followed"
+                                binding.buttonFollow.text = "Unfollow"
                             } else {
-                                binding.buttonFollow.setTextColor(Color.WHITE)
-                                binding.buttonFollow.setBackgroundColor(androidx.cardview.R.color.cardview_dark_background)
                                 binding.buttonFollow.text = "Follow"
                             }
                         }

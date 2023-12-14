@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
@@ -28,6 +29,9 @@ class SettingActivity : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        supportActionBar?.hide()
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_setting)
 
         val docRef = FirebaseFirestore.getInstance().collection("users")

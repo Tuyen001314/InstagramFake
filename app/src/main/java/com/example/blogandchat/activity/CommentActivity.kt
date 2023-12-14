@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.blogandchat.R
@@ -22,6 +23,9 @@ class CommentActivity : AppCompatActivity() {
     lateinit var binding: ActivityCommentBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        supportActionBar?.hide()
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_comment)
 
         postCommment = intent.getStringExtra("id").toString()

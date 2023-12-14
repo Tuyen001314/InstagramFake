@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.blogandchat.R
 import com.example.blogandchat.databinding.ActivitySignUpBinding
@@ -18,6 +19,9 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        supportActionBar?.hide()
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_sign_up)
         firebaseAuth = FirebaseAuth.getInstance()
 
