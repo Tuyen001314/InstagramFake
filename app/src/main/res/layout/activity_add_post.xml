@@ -9,18 +9,6 @@
     android:background="#F8F6F6"
     tools:context=".activity.AddPostActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/add_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/shape_button_rounded_2"
-        android:backgroundTint="@color/cardview_dark_background"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="Post"
-        app:titleTextColor="@color/white" />
 
     <ImageView
         android:id="@+id/img_view_add"
@@ -31,8 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-
-        app:layout_constraintTop_toBottomOf="@id/add_toolbar"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/image_add" />
 
     <EditText

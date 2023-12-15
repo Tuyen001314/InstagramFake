@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
@@ -23,6 +24,7 @@ class UpdateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_update)
 
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
 
         Glide.with(this).load(intent.getStringExtra("image")).into(binding.circleImageViewChange)
         binding.edtNameEnterChange.hint = intent.getStringExtra("name")

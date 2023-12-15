@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
@@ -21,7 +22,10 @@ class SetUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySetUpBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       binding = DataBindingUtil.setContentView(this,R.layout.activity_set_up)
+
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
+
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_set_up)
 
         viewModel.uiState.observe(this) { uiState ->
             uiState?.let {

@@ -85,6 +85,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                 } else {
                     holder.lastMessage.text = AppKey.decrypt(message.message)
                 }
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

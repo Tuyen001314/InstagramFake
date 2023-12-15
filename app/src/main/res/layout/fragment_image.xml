@@ -4,15 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
     android:id="@+id/image_fragment"
     tools:context=".fragment.ImageFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <View
+        android:id="@+id/viewBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B3000000"
+        android:visibility="visible" />
+
     <ImageButton
         android:id="@+id/backImgBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         android:src="@drawable/ic_baseline_arrow_back_24"
         app:layout_constraintBottom_toTopOf="@+id/img_fragment"
         app:layout_constraintStart_toStartOf="parent" />
@@ -22,6 +28,7 @@
         android:layout_height="400dp"
         android:scaleType="centerCrop"
         android:text="@string/hello_blank_fragment"
+        app:layout_constraintVertical_bias="0.36"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

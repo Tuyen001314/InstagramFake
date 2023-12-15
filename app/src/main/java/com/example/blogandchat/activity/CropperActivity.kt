@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.blogandchat.R
 import com.yalantis.ucrop.UCrop
 import java.io.File
@@ -18,6 +19,7 @@ class CropperActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cropper)
 
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         readIntent()
 
         val options = UCrop.Options()

@@ -37,40 +37,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!--        <com.google.android.material.bottomnavigation.BottomNavigationView-->
-            <!--            android:id="@+id/bottomNav"-->
-            <!--            android:layout_width="match_parent"-->
-            <!--            android:layout_height="60dp"-->
-            <!--            android:layout_alignParentBottom="true"-->
-            <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--            app:layout_constraintEnd_toEndOf="parent"-->
-            <!--            app:layout_constraintStart_toStartOf="parent"-->
-            <!--            app:menu="@menu/bottom_navigation_menu"-->
-            <!--            style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"-->
-            <!--            android:scrollIndicators="left"/>-->
-            <com.ismaeldivita.chipnavigation.ChipNavigationBar
+            <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottomNav"
+                style="@style/Widget.MaterialComponents.BottomNavigationView"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_gravity="bottom"
-                android:background="@color/white"
-                android:backgroundTint="@color/black"
-                app:cnb_addBottomInset="false"
-                app:cnb_addLeftInset="false"
-                app:cnb_addRightInset="false"
-                app:cnb_addTopInset="false"
-                app:cnb_animationDuration="175"
-                app:cnb_badgeColor="#F44336"
-                app:cnb_iconSize="30dp"
-                app:cnb_menuResource="@menu/bottom_navigation_menu"
-                app:cnb_orientationMode="horizontal"
-                app:cnb_radius="20dp"
-                app:cnb_unselectedColor="#696969"
+                android:layout_alignParentBottom="true"
+                android:scrollIndicators="left"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:ignore="MissingConstraints" />
+                app:menu="@menu/bottom_navigation_menu" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

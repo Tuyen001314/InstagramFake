@@ -4,24 +4,22 @@
     <item
         android:id="@+id/home"
         android:icon="@drawable/ic_baseline_home_24"
-        app:cnb_iconColor="#90CAF9"
         android:title="Home"  />
 
     <item
         android:id="@+id/favorites"
         android:icon="@drawable/ic_baseline_favorite_border_24"
-        app:cnb_iconColor="@color/favorites"
         android:title="Favorites"  />
 
     <item
         android:id="@+id/search"
         android:icon="@drawable/ic_baseline_search_24"
         app:cnb_iconColor="@color/search"
-        android:title="Search" />
+        android:title="Search"/>
+
     <item
         android:id="@+id/message"
         android:icon="@drawable/m1"
-        app:cnb_iconColor="@color/message"
         android:title="Message" />
 
 </menu>
