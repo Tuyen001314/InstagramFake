@@ -3,6 +3,7 @@ package com.example.blogandchat.fragment
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -87,17 +88,23 @@ class HomeFragment : Fragment() {
             listenerRegistration = query.addSnapshotListener(
                 EventListener<QuerySnapshot?> { value, _ ->
                     for (doc in value!!.documentChanges) {
-                        if (doc.type == DocumentChange.Type.ADDED) {
-                            val postId = doc.document.id
-                            val post: Post = doc.document.toObject(Post::class.java).withId(postId)
-                            postList.add(post)
-                            adapter.notifyDataSetChanged()
-                        } else {
-                            adapter.notifyDataSetChanged()
+                        if (doc.document.data.isNotEmpty()) {
+                            if (doc.type == DocumentChange.Type.ADDED) {
+                                val postId = doc.document.id
+                                val post: Post =
+                                    doc.document.toObject(Post::class.java).withId(postId)
+                                postList.add(post)
+                                adapter.notifyDataSetChanged()
+                            } else {
+                                adapter.notifyDataSetChanged()
+                            }
                         }
                     }
                     listenerRegistration.remove()
+
+                    Log.d("buituyen", postList.toString())
                 })
+
         }
 
         adapter = activity?.let {

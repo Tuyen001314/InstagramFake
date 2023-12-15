@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        supportActionBar?.hide()
+        //supportActionBar?.hide()
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        bottomNav.setupWithNavController(navController)
 
         binding.bottomNav.setOnItemSelectedListener { id ->
-            when (id) {
+            when (id.itemId) {
                 R.id.home -> {
                     val homeFragment = HomeFragment()
                     loadFragment(homeFragment)
@@ -104,6 +104,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.favorites -> {
                     val favoriteFragment = FavoriteFragment()
                     loadFragment(favoriteFragment)
+                }
+                else -> {
+
                 }
             }
             true

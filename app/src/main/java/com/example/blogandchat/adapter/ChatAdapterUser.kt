@@ -76,12 +76,16 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                     }
                 }
 
-                if (message.senderId == FirebaseAuth.getInstance().uid) {
-                    holder.lastMessage.text = "Bạn: " + message.message
+                try {
+                    if (message.senderId == FirebaseAuth.getInstance().uid) {
+                        holder.lastMessage.text = "Bạn: " + message.message
+                    } else {
+                        holder.lastMessage.text = message.message
+                    }
+                } catch (e: Exception) {
 
-                } else {
-                    holder.lastMessage.text = message.message
                 }
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

@@ -23,7 +23,7 @@ class UpdateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_update)
-        supportActionBar?.hide()
+
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
 
         Glide.with(this).load(intent.getStringExtra("image")).into(binding.circleImageViewChange)
