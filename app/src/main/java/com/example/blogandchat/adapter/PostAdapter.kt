@@ -19,6 +19,7 @@ import com.example.blogandchat.R
 import com.example.blogandchat.activity.CommentActivity
 import com.example.blogandchat.activity.OtherUserProfile
 import com.example.blogandchat.activity.SettingActivity
+import com.example.blogandchat.dialog.CommentDialogFragment
 import com.example.blogandchat.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -35,6 +36,8 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     private lateinit var auth: FirebaseAuth
 
     private lateinit var onClickImage: OnClickImage
+
+    private lateinit var onClickComment: (id: String, postId: String) -> Unit
 
     constructor(
         context: Context,
@@ -177,12 +180,10 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
         }
 
         holder.commentPost.setOnClickListener {
-            val intent = Intent(context, CommentActivity::class.java)
-            intent.putExtra("id", postId)
-            intent.putExtra("userId", FirebaseAuth.getInstance().uid)
-            context.startActivity(intent)
+            if (postId != null) {
+                FirebaseAuth.getInstance().uid?.let { it1 -> onClickComment.invoke(postId, it1) }
+            }
         }
-
 
         holder.likeImage.setOnClickListener {
             val ref = FirebaseAuth.getInstance().uid?.let { it1 ->
@@ -225,6 +226,9 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
         }
     }
 
+    fun onCLickComment(onClickComment: (String, String) -> Unit) {
+        this.onClickComment = onClickComment
+    }
 
     override fun getItemCount(): Int {
         return listPost.size

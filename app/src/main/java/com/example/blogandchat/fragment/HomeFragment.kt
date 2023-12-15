@@ -18,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.OnClickImage
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.AddPostActivity
+import com.example.blogandchat.activity.CommentActivity
 import com.example.blogandchat.adapter.PostAdapter
 import com.example.blogandchat.databinding.FragmentHomeBinding
+import com.example.blogandchat.dialog.CommentDialogFragment
 import com.example.blogandchat.model.Post
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -120,6 +122,11 @@ class HomeFragment : Fragment() {
                 }
             })
         }!!
+
+        adapter.onCLickComment { postId, uId ->
+            CommentDialogFragment.show(childFragmentManager,
+                tag = "comment", postId = postId, uId = uId)
+        }
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
