@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -19,7 +20,7 @@ import com.example.blogandchat.databinding.ActivityAddPostBinding
 
 class AddPostActivity : AppCompatActivity() {
     private val REQUEST_CODE = 100
-    private lateinit var viewModel: AddPostViewModel
+    private val viewModel: AddPostViewModel by viewModels()
 
     private lateinit var mGetContent: ActivityResultLauncher<String>
 
@@ -31,9 +32,6 @@ class AddPostActivity : AppCompatActivity() {
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_post)
-
-        viewModel = ViewModelProvider(this)[AddPostViewModel::class.java]
-
         viewModel.uiState.observe(this) { uiState ->
             uiState?.let {
                 binding.imgViewAdd.setImageURI(uiState.uri)

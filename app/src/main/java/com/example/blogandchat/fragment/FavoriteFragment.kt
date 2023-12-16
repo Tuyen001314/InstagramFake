@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.R
@@ -31,10 +32,11 @@ class FavoriteFragment : Fragment() {
 
     private lateinit var adapter: FavoriteAdapter
     private lateinit var adapterSuggest: SuggestFavoriteAdapter
-    private val listFavorite: MutableList<User> = ArrayList()
-    private val listFavoriteSuggest: MutableList<User> = ArrayList()
+    private val listFavorite = mutableListOf<User>()
+    private val listFavoriteSuggest = mutableListOf<User>()
     private lateinit var listenerRegistration: ListenerRegistration
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private val viewModel: FavoriteViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,53 +52,12 @@ class FavoriteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val listSuggest = view.findViewById<RecyclerView>(R.id.listSuggest)
         val listRequest = view.findViewById<RecyclerView>(R.id.listRequest)
-
-
-        val id = FirebaseAuth.getInstance().uid
-        FirebaseFirestore.getInstance().collection("users/$id/receive_request")
-            .get().addOnSuccessListener { documents ->
-                for (document in documents) {
-                    // val firebaseModel =
-                    val idUserReceive = document.id
-                    FirebaseFirestore.getInstance().collection("users").document(idUserReceive)
-                        .get().addOnSuccessListener { document ->
-                            if (document != null) {
-                                document.toObject(User::class.java)?.let { listFavorite.add(it) }
-                                adapter.notifyDataSetChanged()
-                            }
-                        }
-                        .addOnFailureListener {
-                        }
-                }
-            }
-
         adapter = activity?.let { FavoriteAdapter(it, listFavorite) }!!
         listRequest.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
-        linearLayoutManager.orientation = RecyclerView.VERTICAL
+        linearLayoutManager.orientation = RecyclerView.HORIZONTAL
         listRequest.layoutManager = linearLayoutManager
         listRequest.adapter = adapter
-        adapter.notifyDataSetChanged()
-
-        FirebaseFirestore.getInstance().collection("users").whereNotEqualTo("id", id)
-            .get().addOnSuccessListener { documents ->
-                for (document in documents) {
-                    // val firebaseModel =
-                    val idUserReceive = document.id
-                    // listFavoriteSuggest.add(document.toObject(User::class.java))
-                    // adapterSuggest.notifyDataSetChanged()
-                    FirebaseFirestore.getInstance().collection("users/$id/following")
-                        .document(idUserReceive)
-                        .get().addOnSuccessListener { doc ->
-                            if (!doc.exists()) {
-                                listFavoriteSuggest.add(document.toObject(User::class.java))
-                                adapterSuggest.notifyDataSetChanged()
-                            }
-                        }
-                        .addOnFailureListener {
-                        }
-                }
-            }
 
         adapterSuggest = activity?.let { SuggestFavoriteAdapter(it, listFavoriteSuggest) }!!
         listSuggest.setHasFixedSize(true)
@@ -104,6 +65,20 @@ class FavoriteFragment : Fragment() {
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         listSuggest.layoutManager = linearLayoutManager
         listSuggest.adapter = adapterSuggest
-        adapterSuggest.notifyDataSetChanged()
+
+        viewModel.listFavorite.observe(viewLifecycleOwner){
+            println(it.toString())
+            listFavorite.clear()
+            listFavorite.addAll(it)
+            adapter.notifyDataSetChanged()
+        }
+
+        viewModel.listSuggest.observe(viewLifecycleOwner){
+            println(it.toString())
+            listFavoriteSuggest.clear()
+            listFavoriteSuggest.addAll(it)
+            adapterSuggest.notifyDataSetChanged()
+        }
+
     }
 }

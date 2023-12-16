@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        bottomNav.setupWithNavController(navController)
 
         binding.bottomNav.setOnItemSelectedListener { id ->
-            when (id) {
+            when (id.itemId) {
                 R.id.home -> {
                     val homeFragment = HomeFragment()
                     loadFragment(homeFragment)
