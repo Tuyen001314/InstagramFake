@@ -80,10 +80,11 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                 }
 
                 if (message.senderId == FirebaseAuth.getInstance().uid) {
-                    holder.lastMessage.text = "Bạn: " + AppKey.decrypt(message.message)
-
+                    AppKey.decrypt(message.message)?.let {
+                        holder.lastMessage.text = "Bạn: " + it
+                    }
                 } else {
-                    holder.lastMessage.text = AppKey.decrypt(message.message)
+                    AppKey.decrypt(message.message)?.let { holder.lastMessage.text = it }
                 }
 
             }

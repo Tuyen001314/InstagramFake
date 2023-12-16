@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.blogandchat.utils.AppKey
+import com.google.firebase.firestore.auth.FirebaseAppCheckTokenProvider
 
 class App : Application() {
     @RequiresApi(Build.VERSION_CODES.S)

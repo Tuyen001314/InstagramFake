@@ -11,7 +11,7 @@ import com.example.blogandchat.model.Message
 import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
 
-class MessageAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var context: Context
     private lateinit var listMessage: MutableList<Message>
@@ -33,6 +33,7 @@ class MessageAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 val view = inflater.inflate(R.layout.send_chat_layout, p0, false)
                 SenderViewHolder(view)
             }
+
             else -> {
                 val view = inflater.inflate(R.layout.receive_chat_layout, p0, false)
                 ReceiverViewHolder(view)
@@ -44,12 +45,17 @@ class MessageAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val message: Message = listMessage[position]
         if (holder.javaClass == SenderViewHolder::class.java) {
             val viewHolder = holder as SenderViewHolder
-            viewHolder.tvMessage.text = AppKey.decrypt(message.message)
-            viewHolder.timeOfMessage.text = message.currentTime
+            AppKey.decrypt(message.message)?.let {
+                viewHolder.tvMessage.text = it
+                viewHolder.timeOfMessage.text = message.currentTime
+            }
+
         } else {
             val viewHolder = holder as ReceiverViewHolder
-            viewHolder.tvMessage.text = AppKey.decrypt(message.message)
-            viewHolder.timeOfMessage.text = message.currentTime
+            AppKey.decrypt(message.message)?.let {
+                viewHolder.tvMessage.text = it
+                viewHolder.timeOfMessage.text = message.currentTime
+            }
         }
     }
 

@@ -9,13 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blogandchat.FavoriteCallback
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.FavoriteAdapter
 import com.example.blogandchat.adapter.SuggestFavoriteAdapter
 import com.example.blogandchat.model.User
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import java.util.HashMap
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -50,30 +52,63 @@ class FavoriteFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.initialize()
         val listSuggest = view.findViewById<RecyclerView>(R.id.listSuggest)
         val listRequest = view.findViewById<RecyclerView>(R.id.listRequest)
-        adapter = activity?.let { FavoriteAdapter(it, listFavorite) }!!
+        adapter = activity?.let {
+            FavoriteAdapter(it, listFavorite, object : FavoriteCallback {
+                override fun accept(user: User) {
+                    viewModel.acceptFollow(user)
+                    val index = listFavorite.indexOf(user)
+                    listFavorite.remove(user)
+                    adapter.notifyItemChanged(index)
+                }
+
+                override fun delete(user: User) {
+                    val index = listFavorite.indexOf(user)
+                    listFavorite.remove(user)
+                    adapter.notifyItemChanged(index)
+                }
+
+            })
+        }!!
         listRequest.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = RecyclerView.HORIZONTAL
         listRequest.layoutManager = linearLayoutManager
         listRequest.adapter = adapter
 
-        adapterSuggest = activity?.let { SuggestFavoriteAdapter(it, listFavoriteSuggest) }!!
+        adapterSuggest = activity?.let {
+            SuggestFavoriteAdapter(it, listFavoriteSuggest, object : FavoriteCallback {
+                override fun accept(user: User) {
+                    viewModel.follow(user)
+                    val index = listFavoriteSuggest.indexOf(user)
+                    listFavoriteSuggest.remove(user)
+                    adapterSuggest.notifyItemChanged(index)
+                }
+
+                override fun delete(user: User) {
+                    val index = listFavoriteSuggest.indexOf(user)
+                    listFavoriteSuggest.remove(user)
+                    adapterSuggest.notifyItemChanged(index)
+                }
+
+            })
+        }!!
         listSuggest.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         listSuggest.layoutManager = linearLayoutManager
         listSuggest.adapter = adapterSuggest
 
-        viewModel.listFavorite.observe(viewLifecycleOwner){
+        viewModel.listFavorite.observe(viewLifecycleOwner) {
             println(it.toString())
             listFavorite.clear()
             listFavorite.addAll(it)
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.listSuggest.observe(viewLifecycleOwner){
+        viewModel.listSuggest.observe(viewLifecycleOwner) {
             println(it.toString())
             listFavoriteSuggest.clear()
             listFavoriteSuggest.addAll(it)

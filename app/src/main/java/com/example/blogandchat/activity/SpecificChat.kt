@@ -2,6 +2,7 @@ package com.example.blogandchat.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -71,7 +72,7 @@ class SpecificChat : AppCompatActivity() {
                     val message: Message? = snapshot1.getValue(Message::class.java)
                     if (message != null) {
                         messageList.add(message)
-                        //Log.d("hhhhh", "Value is: $message");
+                        Log.e(">>>>>>>>>>>>", "Value is: $message");
                     }
                 }
 

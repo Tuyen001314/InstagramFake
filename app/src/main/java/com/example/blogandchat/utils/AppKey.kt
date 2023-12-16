@@ -21,6 +21,7 @@ import java.util.Arrays
 import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
 import javax.crypto.KeyGenerator
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object AppKey {
@@ -85,10 +86,15 @@ object AppKey {
         return Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
     }
 
-    fun decrypt(data: String): String {
-        cipher.init(Cipher.DECRYPT_MODE, secretKey)
-        val encryptedBytes: ByteArray = Base64.decode(data, Base64.DEFAULT)
-        val decryptedBytes = cipher.doFinal(encryptedBytes)
-        return String(decryptedBytes, StandardCharsets.UTF_8)
+    fun decrypt(data: String): String? {
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, secretKey)
+            val encryptedBytes: ByteArray = Base64.decode(data, Base64.DEFAULT)
+            val decryptedBytes = cipher.doFinal(encryptedBytes)
+            return String(decryptedBytes, StandardCharsets.UTF_8)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
     }
 }
