@@ -6,31 +6,27 @@
     android:padding="3dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+
 
         <TextView
             android:id="@+id/nameOfUserFollow"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:text="Name Display Here"
+            android:layout_marginStart="12dp"
+            tools:text="Name Display Here"
+            android:textStyle="bold"
             android:textColor="@color/cardview_dark_background"
-            android:textSize="17sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/cardviewOfUserFollow"
             app:layout_constraintStart_toEndOf="@+id/cardviewOfUserFollow"
             app:layout_constraintTop_toTopOf="parent" />
 
         <de.hdodenhof.circleimageview.CircleImageView
-
+            android:layout_marginVertical="8dp"
             android:id="@+id/cardviewOfUserFollow"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_marginStart="16dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/avt_img"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -39,25 +35,48 @@
 
         </de.hdodenhof.circleimageview.CircleImageView>
 
-        <Button
+        <TextView
             android:id="@+id/buttonFollow"
-            style="@style/ButtonStyle"
+            android:background="@drawable/bg_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="16dp"
             android:backgroundTint="@color/red"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
             android:text="Theo dõi"
+            android:textSize="14sp"
+            android:textStyle="bold"
             android:textAllCaps="false"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_delete"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/button_delete"
+            android:background="@drawable/bg_btn_gray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Xóa"
+            android:textSize="14sp"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/eraseFollow"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+            />
 
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:id="@+id/eraseFollow"
+            android:visibility="gone"
             android:src="@drawable/ic_baseline_close_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,5 +84,3 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>

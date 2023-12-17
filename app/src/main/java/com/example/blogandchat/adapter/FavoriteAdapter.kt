@@ -60,7 +60,7 @@ class FavoriteAdapter(
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameOfUser: TextView = itemView.findViewById(R.id.nameOfUser1)
         val avatar: CircleImageView = itemView.findViewById(R.id.cardviewOfUser1)
-        val accept: Button = itemView.findViewById(R.id.buttonAccept)
+        val accept: TextView = itemView.findViewById(R.id.buttonAccept)
         val erase: ImageView = itemView.findViewById(R.id.eraseRequest)
     }
 
