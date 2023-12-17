@@ -27,7 +27,7 @@ import java.util.HashMap
 class SuggestFavoriteAdapter(
     val context: Context,
     val listUser: MutableList<User>,
-    val favoriteCallback: FavoriteCallback
+    val favoriteCallback: FavoriteCallback,
 ) :
     RecyclerView.Adapter<SuggestFavoriteAdapter.ViewHolder?>() {
 
@@ -47,9 +47,6 @@ class SuggestFavoriteAdapter(
 
         holder.follow.setOnClickListener {
             favoriteCallback.accept(user)
-            listUser.remove(user)
-
-            holder.itemView.visibility = View.INVISIBLE
         }
 
         holder.nameOfUser.setOnClickListener {
@@ -60,8 +57,6 @@ class SuggestFavoriteAdapter(
 
         holder.erase.setOnClickListener {
             favoriteCallback.delete(user)
-            listUser.remove(user)
-            holder.itemView.visibility = View.INVISIBLE
         }
 
     }
@@ -74,8 +69,8 @@ class SuggestFavoriteAdapter(
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameOfUser: TextView = itemView.findViewById(R.id.nameOfUserFollow)
         val avatar: CircleImageView = itemView.findViewById(R.id.cardviewOfUserFollow)
-        val follow: Button = itemView.findViewById(R.id.buttonFollow)
-        val erase: ImageView = itemView.findViewById(R.id.eraseFollow)
+        val follow: TextView = itemView.findViewById(R.id.buttonFollow)
+        val erase: TextView = itemView.findViewById(R.id.button_delete)
     }
 
 }
