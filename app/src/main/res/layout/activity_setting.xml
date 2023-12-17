@@ -1,210 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/setting_activity"
-    android:background="#F2EEF8"
-    tools:context=".activity.SettingActivity">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/setup_toolbar"
-        app:layout_constraintHeight_percent="0.55"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/setting_activity"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/shape_button_rounded_2"
-        android:backgroundTint="@color/cardview_dark_background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="My Profile"
-        app:titleTextColor="@color/white"
-        tools:ignore="MissingConstraints" >
+        android:layout_height="match_parent"
+        tools:context=".activity.SettingActivity">
 
-    </androidx.appcompat.widget.Toolbar>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:padding="5dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/setup_toolbar">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setup_toolbar"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintTop_toTopOf="parent">
 
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/circleImageView"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/avt_img"
-                app:layout_constraintBottom_toTopOf="@+id/btn_edit"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.05"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.15" />
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:backgroundTint="@color/white"
-                app:cardCornerRadius="15dp"
-                app:layout_constraintBottom_toTopOf="@+id/btn_edit"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-
-            <TextView
-                android:id="@+id/edt_name_enter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:text="Linh"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@+id/btn_edit"
-                app:layout_constraintEnd_toEndOf="@+id/circleImageView"
-                app:layout_constraintStart_toStartOf="@+id/circleImageView"
-                app:layout_constraintTop_toBottomOf="@+id/circleImageView" />
-
-            <TextView
-                android:id="@+id/postMyProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                app:layout_constraintVertical_bias="0.75"
-                android:text="Post"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
-                app:layout_constraintStart_toEndOf="@+id/circleImageView"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/postCountMyProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="3"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/postMyProfile"
-                app:layout_constraintEnd_toEndOf="@+id/postMyProfile"
-                app:layout_constraintStart_toStartOf="@+id/postMyProfile" />
-
-            <TextView
-                android:id="@+id/followingMyProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Following"
-                android:layout_marginEnd="15dp"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.75" />
-
-            <TextView
-                android:id="@+id/followerCountMyProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10"
-                android:layout_marginBottom="10dp"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/followerMyProfile"
-                app:layout_constraintEnd_toStartOf="@+id/followingMyProfile"
-                app:layout_constraintStart_toEndOf="@+id/postMyProfile" />
-
-
-            <TextView
-                android:id="@+id/followerMyProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Follower"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
-                app:layout_constraintEnd_toStartOf="@+id/followingMyProfile"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/postMyProfile"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.75" />
-
-            <TextView
-                android:id="@+id/followingCountMyProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10"
-                android:layout_marginBottom="10dp"
-                android:textColor="@color/cardview_dark_background"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/followingMyProfile"
-                app:layout_constraintEnd_toEndOf="@+id/followingMyProfile"
-                app:layout_constraintStart_toStartOf="@+id/followingMyProfile" />
-
-            <Button
-                android:id="@+id/btn_edit"
-                style="@style/ButtonStyle"
-                android:fontFamily="@font/raleway_dots"
-                android:textStyle="bold"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAllCaps="false"
-
-                android:backgroundTint="@color/cardview_dark_background"
-                android:padding="5dp"
-                android:text="Edit Profile"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_weight="2.0"
-            android:layout_marginTop="5dp"
-            android:layout_height="0dp">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewProfile"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/setup_toolbar">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/circleImageView"
+                    android:layout_width="102dp"
+                    android:layout_height="102dp"
+                    android:src="@drawable/avt_img"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/btn_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_curved_12dp_gray"
+                    android:backgroundTint="@color/red"
+                    android:gravity="center"
+                    android:text="Edit Profile"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/postCountMyProfile"
+                    app:layout_constraintTop_toBottomOf="@+id/postCountMyProfile" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/nick_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:lineSpacingExtra="-2sp"
+                    android:text="lauritisreyes"
+                    android:textColor="#686868"
+                    android:textSize="14sp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="@+id/nameUserOther"
+                    app:layout_constraintTop_toBottomOf="@+id/nameUserOther" />
+
+                <TextView
+                    android:id="@+id/born_26_nov"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:lineSpacingExtra="-2sp"
+                    android:text="Born 26 Nov. 1996"
+                    android:textColor="#686868"
+                    android:textSize="14sp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="@+id/nick_name"
+                    app:layout_constraintTop_toBottomOf="@+id/nick_name" />
+
+                <TextView
+                    android:id="@+id/joined_aug_"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:lineSpacingExtra="-2sp"
+                    android:text="Joined Aug. 2020"
+                    android:textSize="14sp"
+                    android:textColor="#686868"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/born_26_nov"
+                    app:layout_constraintTop_toTopOf="@+id/born_26_nov" />
+
+                <TextView
+                    android:id="@+id/nameUserOther"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Laura Reyes"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintStart_toEndOf="@+id/circleImageView"
+                    app:layout_constraintTop_toTopOf="@+id/circleImageView" />
+
+                <TextView
+                    android:id="@+id/postMyProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Posts"
+                    android:textColor="#686868"
+                    android:layout_marginStart="5dp"
+                    android:textSize="14sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/postCountMyProfile"
+                    app:layout_constraintStart_toEndOf="@+id/postCountMyProfile"
+                    app:layout_constraintTop_toTopOf="@+id/postCountMyProfile" />
+
+                <TextView
+                    android:id="@+id/postCountMyProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:text="3"
+                    android:textColor="#272727"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintStart_toStartOf="@+id/description"
+                    app:layout_constraintTop_toBottomOf="@+id/description" />
+
+                <TextView
+                    android:id="@+id/followingMyProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="Following"
+                    android:textColor="#686868"
+                    android:textSize="14sp"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/followingCountMyProfile"
+                    app:layout_constraintStart_toEndOf="@+id/followingCountMyProfile"
+                    app:layout_constraintTop_toTopOf="@+id/followingCountMyProfile" />
+
+                <TextView
+                    android:id="@+id/followingCountMyProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="32dp"
+                    android:text="3"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/followerMyProfile"
+                    app:layout_constraintTop_toBottomOf="@+id/description" />
+
+                <TextView
+                    android:id="@+id/followerMyProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Followers"
+                    android:textColor="#686868"
+                    android:textSize="14sp"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/followerCountMyProfile"
+                    app:layout_constraintStart_toEndOf="@+id/followerCountMyProfile"
+                    app:layout_constraintTop_toTopOf="@+id/followerCountMyProfile" />
+
+                <TextView
+                    android:id="@+id/followerCountMyProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="10"
+                    android:textColor="#272727"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="32dp"
+                    app:layout_constraintHorizontal_bias="0.4"
+                    app:layout_constraintStart_toEndOf="@+id/postMyProfile"
+                    app:layout_constraintTop_toBottomOf="@+id/description" />
+
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textSize="14sp"
+                    android:textColor="#272727"
+                    android:lineSpacingExtra="-2sp"
+                    android:text="UX UI Designer with Frontend Skills"
+                    app:layout_constraintStart_toStartOf="@+id/circleImageView"
+                    app:layout_constraintTop_toBottomOf="@+id/circleImageView" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1.75">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tabGravity="fill"
+                    app:tabMode="scrollable" />
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

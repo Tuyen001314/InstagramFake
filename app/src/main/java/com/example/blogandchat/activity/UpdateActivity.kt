@@ -33,10 +33,13 @@ class UpdateActivity : AppCompatActivity() {
             uiState?.let {
                 Glide.with(this).load(uiState.uri).into(binding.circleImageViewChange)
                 binding.progressBarChange.isVisible = uiState.addingUser
+//                binding.imgUpload.visibility = View.INVISIBLE
                 if (uiState.addUserSuccess) {
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
-                    binding.progressBarChange.visibility = View.GONE
+                    binding.progressBarChange.visibility = View.INVISIBLE
+                } else {
+//                    binding.imgUpload.visibility = View.VISIBLE
                 }
             }
         }
@@ -51,7 +54,7 @@ class UpdateActivity : AppCompatActivity() {
             if (!isPhotoSelected && binding.edtNameEnterChange.length() == 0) {
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
-                binding.progressBarChange.visibility = View.GONE
+                binding.progressBarChange.visibility = View.INVISIBLE
             } else if (binding.edtNameEnterChange.length() != 0) {
                 viewModel.changeName(
                     intent.getStringExtra("id").toString(),

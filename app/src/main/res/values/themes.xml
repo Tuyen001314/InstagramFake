@@ -19,6 +19,11 @@
         <item name="background">@drawable/shape_button_rounded</item>
     </style>
 
+    <style name="progressBarRed" parent="@style/Theme.AppCompat">
+        <item name="colorAccent">@color/red</item>
+    </style>
+
+
     <style name="TintButtonStyle">
         <item name="backgroundTint">@color/red</item>
     </style>

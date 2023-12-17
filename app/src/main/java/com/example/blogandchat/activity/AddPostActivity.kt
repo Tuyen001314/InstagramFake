@@ -34,7 +34,8 @@ class AddPostActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_post)
         viewModel.uiState.observe(this) { uiState ->
             uiState?.let {
-                binding.imgViewAdd.setImageURI(uiState.uri)
+                binding.imgViewPost.setImageURI(uiState.uri)
+                binding.imgUpload.visibility = View.GONE
                 binding.progressBarPost.isVisible = uiState.addingPost
                 if (uiState.addPostSuccess) {
                     val intent = Intent(this, MainActivity::class.java)
@@ -42,6 +43,7 @@ class AddPostActivity : AppCompatActivity() {
                 } else if (!uiState.addError) {
                     Toast.makeText(this, "Vui lòng thêm hình ảnh trước khi đăng", Toast.LENGTH_LONG)
                         .show()
+                    binding.imgUpload.visibility = View.VISIBLE
                     binding.progressBarPost.visibility = View.INVISIBLE
                 }
             }
