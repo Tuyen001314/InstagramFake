@@ -34,19 +34,16 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     lateinit var context: Context
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-
-    private lateinit var onClickImage: OnClickImage
+    lateinit var clickImage: (Post) -> Unit
 
     private lateinit var onClickComment: (id: String, postId: String) -> Unit
 
     constructor(
         context: Context,
         listPost: MutableList<Post>,
-        onClickImage: OnClickImage
     ) : this() {
         this.listPost = listPost
         this.context = context
-        this.onClickImage = onClickImage
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -54,7 +51,7 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
             LayoutInflater.from(parent.context).inflate(R.layout.each_post, parent, false)
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
-        return ViewHolder(view, onClickImage)
+        return ViewHolder(view)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -62,7 +59,9 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
         val post: Post = listPost[position]
         Glide.with(context).load(post.image).into(holder.postPic)
 
-        holder.bindData(post.image)
+        holder.postPic.setOnClickListener {
+            clickImage.invoke(post)
+        }
 
         holder.setPostCaption(post.caption)
 
@@ -226,6 +225,10 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
         }
     }
 
+    fun onClickImage(clickImage: (Post) -> Unit) {
+        this.clickImage = clickImage
+    }
+
     fun onCLickComment(onClickComment: (String, String) -> Unit) {
         this.onClickComment = onClickComment
     }
@@ -235,7 +238,7 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     }
 
 
-    class ViewHolder(itemView: View, private val onClickImage: OnClickImage) :
+    class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
         val likeImage: ImageView = itemView.findViewById(R.id.img_view_like)
@@ -252,12 +255,13 @@ class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 //            postLikes.text = "$count Likes"
 //        }
 
-        fun bindData(id: String) {
+        /*fun bindData(id: String) {
             postPic.setOnClickListener {
                 onClickImage.click(id)
                 //Log.d("image", id.toString() + "")
+
             }
-        }
+        }*/
 
         fun setPostUsername(username: String?) {
             this.userName.text = username

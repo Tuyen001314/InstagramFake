@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.BlogAndChat" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.BlogAndChat" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -17,6 +17,10 @@
 
     <style name="ButtonStyle">
         <item name="background">@drawable/shape_button_rounded</item>
+    </style>
+
+    <style name="TintButtonStyle">
+        <item name="backgroundTint">@color/red</item>
     </style>
 
     <style name="BottomNavTextActive">

@@ -110,18 +110,18 @@ class HomeFragment : Fragment() {
         }
 
         adapter = activity?.let {
-            PostAdapter(it, postList, object : OnClickImage {
-                override fun click(id: String) {
-                    val transaction = fragmentManager?.beginTransaction()
-                    if (transaction != null) {
-                        transaction.replace(R.id.home_fragment, ImageFragment(id), null)
-                        transaction.addToBackStack(null)
-                        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        transaction.commit()
-                    }
-                }
-            })
+            PostAdapter(it, postList)
         }!!
+
+        adapter.onClickImage { post ->
+            val transaction = fragmentManager?.beginTransaction()
+            if (transaction != null) {
+                transaction.replace(R.id.home_fragment, ImageFragment(post.image), null)
+                transaction.addToBackStack(null)
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                transaction.commit()
+            }
+        }
 
         adapter.onCLickComment { postId, uId ->
             CommentDialogFragment.show(childFragmentManager,

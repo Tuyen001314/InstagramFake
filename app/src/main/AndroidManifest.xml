@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.blogandchat">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <application
@@ -13,37 +14,34 @@
         android:label="Instagram"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.BlogAndChat"
         tools:targetApi="31">
 
         <activity
             android:name=".activity.CropperActivity"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".activity.UpdateActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Design.NoActionBar" />
+            android:exported="false"/>
         <activity
             android:name=".activity.SpecificChat"
             android:exported="false"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.Design.NoActionBar" />
+            android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".activity.SettingActivity"
             android:exported="false"
             android:label="@string/title_activity_setting"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.BlogAndChat.NoActionBar" />
+            android:parentActivityName=".activity.MainActivity"/>
         <activity
             android:name=".activity.SignUpActivity"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".activity.SignInActivity"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".activity.SetUpActivity"
-            android:exported="false"
-            android:theme="@style/Theme.BlogAndChat.NoActionBar" />
+            android:exported="false"/>
         <activity
             android:name=".activity.OtherUserProfile"
             android:exported="false" />
@@ -53,8 +51,7 @@
         <activity
             android:name=".activity.AddPostActivity"
             android:exported="false"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Theme.Design.NoActionBar" />
+            android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true"
@@ -73,8 +70,7 @@
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".firebase.FirebaseService"
