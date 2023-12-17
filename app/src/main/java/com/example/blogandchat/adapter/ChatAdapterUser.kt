@@ -13,6 +13,7 @@ import com.example.blogandchat.R
 import com.example.blogandchat.activity.SpecificChat
 import com.example.blogandchat.model.Message
 import com.example.blogandchat.model.User
+import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.ServerTimestamp
@@ -21,7 +22,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>() {
     private lateinit var listUser: MutableList<User>
     private lateinit var context: Context
-    private lateinit var message: Message
+    private var message: Message? = null
     private lateinit var time: ServerTimestamp
 
     constructor(context: Context, listUser: MutableList<User>) : this() {
@@ -38,6 +39,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
 
         val firebaseModel: User = listUser[position]
+     //   AppKey.calculateKey(firebaseModel.publicKey.toString())
 
         Glide.with(context).load(firebaseModel.image).into(holder.avatar)
         holder.nameOfUser.text = firebaseModel.name
@@ -53,6 +55,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
             intent.putExtra("name", firebaseModel.name)
             intent.putExtra("receiveruid", firebaseModel.id)
             intent.putExtra("imageuri", firebaseModel.image)
+            intent.putExtra("publicKey", firebaseModel.publicKey)
             v.context.startActivity(intent)
         })
 
@@ -70,21 +73,18 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                 //messageList.clear()
                 for (snapshot1 in snapshot.children) {
                     message = snapshot1.getValue(Message::class.java)!!
-                    if (message != null) {
-                        //messageList.add(message)
-                        //Log.d("hhhhh", "Value is: $message");
-                    }
+                    //messageList.add(message)
+                    //Log.d("hhhhh", "Value is: $message");
                 }
 
-                try {
-                    if (message.senderId == FirebaseAuth.getInstance().uid) {
-                        holder.lastMessage.text = "Bạn: " + message.message
+                    if (message?.senderId == FirebaseAuth.getInstance().uid) {
+                        AppKey.decrypt(message?.message)?.let {
+                            holder.lastMessage.text = "Bạn: " + it
+                        }
                     } else {
-                        holder.lastMessage.text = message.message
+                        AppKey.decrypt(message?.message)?.let { holder.lastMessage.text = it }
                     }
-                } catch (e: Exception) {
 
-                }
 
             }
 

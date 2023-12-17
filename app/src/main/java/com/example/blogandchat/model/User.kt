@@ -8,9 +8,11 @@ data class User(
     val name: String = "",
     val email: String = "",
     val image: String = "",
-    val status: String = ""
+    val status: String = "",
+    val publicKey: String? = ""
 ): Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
@@ -24,6 +26,7 @@ data class User(
         writeString(email)
         writeString(image)
         writeString(status)
+        writeString(publicKey)
     }
 
     override fun describeContents() = 0

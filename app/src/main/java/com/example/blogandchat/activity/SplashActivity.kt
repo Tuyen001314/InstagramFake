@@ -7,6 +7,7 @@ import android.os.Handler
 import androidx.core.content.ContextCompat
 import com.example.blogandchat.R
 import com.example.blogandchat.firebase.FireStore
+import com.example.blogandchat.utils.AppKey
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +20,7 @@ class SplashActivity : AppCompatActivity() {
         Handler().postDelayed({
             var currentUserId = FireStore().getCurrentUserId()
             if (currentUserId.isNotEmpty()) {
+                FireStore().updatePublicKeyUser(AppKey.getPublicKey())
                 startActivity(Intent(this, MainActivity::class.java))
             } else {
                 startActivity(Intent(this, SignInActivity::class.java))

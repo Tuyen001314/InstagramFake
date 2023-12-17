@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.blogandchat.FavoriteCallback
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.OtherUserProfile
 import com.example.blogandchat.activity.SpecificChat
@@ -23,15 +24,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.HashMap
 
-class SuggestFavoriteAdapter() : RecyclerView.Adapter<SuggestFavoriteAdapter.ViewHolder?>() {
-    private lateinit var listUser: MutableList<User>
-    private lateinit var context: Context
-
-
-    constructor(context: Context, listUser: MutableList<User>) : this() {
-        this.listUser = listUser
-        this.context = context
-    }
+class SuggestFavoriteAdapter(
+    val context: Context,
+    val listUser: MutableList<User>,
+    val favoriteCallback: FavoriteCallback
+) :
+    RecyclerView.Adapter<SuggestFavoriteAdapter.ViewHolder?>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = LayoutInflater.from(parent.context)
@@ -41,46 +39,28 @@ class SuggestFavoriteAdapter() : RecyclerView.Adapter<SuggestFavoriteAdapter.Vie
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val firebaseModel: User = listUser[position]
+        val user: User = listUser[position]
 
-        Glide.with(context).load(firebaseModel.image).into(holder.avatar)
-        holder.nameOfUser.text = firebaseModel.name
+        Glide.with(context).load(user.image).into(holder.avatar)
+        holder.nameOfUser.text = user.name
 
 
-        val id = FirebaseAuth.getInstance().uid
         holder.follow.setOnClickListener {
-            FirebaseFirestore.getInstance().collection("users/$id/following").get()
-                .addOnCompleteListener { _ ->
-                    val timeRequest: MutableMap<String, Any> = HashMap()
-                    timeRequest["id"] = firebaseModel.id
-                    timeRequest["timestamp"] = FieldValue.serverTimestamp()
-                    FirebaseFirestore.getInstance().collection("users/$id/following")
-                        .document(firebaseModel.id)
-                        .set(timeRequest)
-                }
-
-            FirebaseFirestore.getInstance().collection("users/${firebaseModel.id}/follower").get()
-                .addOnCompleteListener { _ ->
-                    val timeRequest: MutableMap<String, Any> = HashMap()
-                    timeRequest["id"] = id.toString()
-                    timeRequest["timestamp"] = FieldValue.serverTimestamp()
-                    FirebaseFirestore.getInstance().collection("users/${firebaseModel.id}/follower")
-                        .document(id.toString())
-                        .set(timeRequest)
-                }
-            listUser.remove(firebaseModel)
+            favoriteCallback.accept(user)
+            listUser.remove(user)
 
             holder.itemView.visibility = View.INVISIBLE
         }
 
         holder.nameOfUser.setOnClickListener {
             val intent = Intent(context, OtherUserProfile::class.java)
-            intent.putExtra("id", firebaseModel.id)
+            intent.putExtra("id", user.id)
             context.startActivity(intent)
         }
 
         holder.erase.setOnClickListener {
-            listUser.remove(firebaseModel)
+            favoriteCallback.delete(user)
+            listUser.remove(user)
             holder.itemView.visibility = View.INVISIBLE
         }
 

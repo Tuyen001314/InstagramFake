@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        val navUserName = binding.navView.findViewById<TextView>(R.id.nameUser)
-        val navImgUser = binding.navView.findViewById<ImageView>(R.id.imageUser)
+        val navUserName = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.nameUser)
+        val navImgUser = binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.imageUser)
 
         val docRef = FirebaseFirestore.getInstance().collection("users")
             .document(FirebaseAuth.getInstance().uid.toString())
@@ -50,8 +50,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         docRef.get().addOnSuccessListener { documentSnapshot ->
             user = documentSnapshot.toObject<User>()!!
-            /*navUserName.text = user.name
-            Glide.with(this).load(user.image).into(navImgUser)*/
+            navUserName.text = user.name
+            Glide.with(this).load(user.image).into(navImgUser)
         }
 
         loadFragment(HomeFragment())

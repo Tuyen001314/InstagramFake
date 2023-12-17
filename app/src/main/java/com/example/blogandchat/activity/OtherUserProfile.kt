@@ -240,6 +240,7 @@ class OtherUserProfile : AppCompatActivity() {
                                 intent.putExtra("name", user.name)
                                 intent.putExtra("receiveruid", user.id)
                                 intent.putExtra("imageuri", user.image)
+                                intent.putExtra("publicKey",user.publicKey)
                                 startActivity(intent)
                             }
                         }
