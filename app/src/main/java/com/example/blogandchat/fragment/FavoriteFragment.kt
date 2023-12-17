@@ -36,7 +36,6 @@ class FavoriteFragment : Fragment() {
     private lateinit var adapterSuggest: SuggestFavoriteAdapter
     private val listFavorite = mutableListOf<User>()
     private val listFavoriteSuggest = mutableListOf<User>()
-    private lateinit var listenerRegistration: ListenerRegistration
     private lateinit var linearLayoutManager: LinearLayoutManager
     private val viewModel: FavoriteViewModel by viewModels()
 
@@ -61,13 +60,13 @@ class FavoriteFragment : Fragment() {
                     viewModel.acceptFollow(user)
                     val index = listFavorite.indexOf(user)
                     listFavorite.remove(user)
-                    adapter.notifyItemChanged(index)
+                    adapter.notifyItemRemoved(index)
                 }
 
                 override fun delete(user: User) {
                     val index = listFavorite.indexOf(user)
                     listFavorite.remove(user)
-                    adapter.notifyItemChanged(index)
+                    adapter.notifyItemRemoved(index)
                 }
 
             })
@@ -84,13 +83,13 @@ class FavoriteFragment : Fragment() {
                     viewModel.follow(user)
                     val index = listFavoriteSuggest.indexOf(user)
                     listFavoriteSuggest.remove(user)
-                    adapterSuggest.notifyItemChanged(index)
+                    adapterSuggest.notifyItemRemoved(index)
                 }
 
                 override fun delete(user: User) {
                     val index = listFavoriteSuggest.indexOf(user)
                     listFavoriteSuggest.remove(user)
-                    adapterSuggest.notifyItemChanged(index)
+                    adapterSuggest.notifyItemRemoved(index)
                 }
 
             })
@@ -102,14 +101,12 @@ class FavoriteFragment : Fragment() {
         listSuggest.adapter = adapterSuggest
 
         viewModel.listFavorite.observe(viewLifecycleOwner) {
-            println(it.toString())
             listFavorite.clear()
             listFavorite.addAll(it)
             adapter.notifyDataSetChanged()
         }
 
         viewModel.listSuggest.observe(viewLifecycleOwner) {
-            println(it.toString())
             listFavoriteSuggest.clear()
             listFavoriteSuggest.addAll(it)
             adapterSuggest.notifyDataSetChanged()

@@ -7,15 +7,16 @@ data class Message(
     val currentTime: String = "",
     val timeStamp: Long? = 0,
     val senderId: String = "",
-    val message: String = ""
+    val message: String = "",
+    val type: Int? = 0
 
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readLong(),
         parcel.readString()!!,
-        parcel.readString()!!
-
+        parcel.readString()!!,
+        parcel.readInt()
     )
 
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
@@ -25,6 +26,7 @@ data class Message(
         }
         writeString(message)
         writeString(senderId)
+        writeInt(type?:0)
     }
 
     override fun describeContents() = 0

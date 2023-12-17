@@ -11,7 +11,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        AppKey.generateKeyPair()
+//        AppKey.generateKeyPair()
     }
 
     companion object {

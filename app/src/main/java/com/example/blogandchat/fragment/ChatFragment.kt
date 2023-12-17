@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.R
@@ -30,11 +31,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ChatFragment : Fragment() {
-
-    private lateinit var firebaseFirestore: FirebaseFirestore
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var mImageViewOfUser: ImageView
-    private lateinit var firebaseModel: User
+    private val viewModel: ChatListViewModel by viewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerView1: RecyclerView
     private var list: MutableList<User> = ArrayList()
@@ -57,30 +54,12 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.fetchListUser()
         recyclerView = view.findViewById(R.id.recyclerViewChat)
         recyclerView1 = view.findViewById(R.id.recyclerViewChat1)
         val searchChat: SearchView = view.findViewById(R.id.searchChat)
 
-        firebaseAuth = FirebaseAuth.getInstance()
-        firebaseFirestore = FirebaseFirestore.getInstance()
 
-        val id = firebaseAuth.uid
-        firebaseFirestore.collection("users/$id/message")
-            .get().addOnSuccessListener { documents ->
-                for (document in documents) {
-                    // val firebaseModel =
-                    val idUserReceive = document.id
-                    FirebaseFirestore.getInstance().collection("users").document(idUserReceive)
-                        .get().addOnSuccessListener { document ->
-                            if (document != null) {
-                                document.toObject(User::class.java)?.let { list.add(it) }
-                                adapter.notifyDataSetChanged()
-                            }
-                        }
-                        .addOnFailureListener {
-                        }
-                }
-            }
 
         adapter = activity?.let { ChatAdapter(it, list) }!!
         recyclerView.setHasFixedSize(true)
@@ -97,6 +76,15 @@ class ChatFragment : Fragment() {
         recyclerView1.layoutManager = linearLayoutManager
         recyclerView1.adapter = adapterUser
         adapterUser.notifyDataSetChanged()
+
+        viewModel.listUser.observe(viewLifecycleOwner) {
+            list.clear()
+            list.addAll(it)
+            adapterUser.notifyDataSetChanged()
+            adapter.notifyDataSetChanged()
+        }
+
+
 
         searchChat.setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {

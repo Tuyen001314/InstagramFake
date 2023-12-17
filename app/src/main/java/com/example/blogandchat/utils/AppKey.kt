@@ -52,11 +52,18 @@ object AppKey {
     }
 
     fun getPublicKey(): String {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-        if (keyStore.containsAlias(KEY_ALIAS)) {
-            val privateKey = keyStore.getEntry(KEY_ALIAS, null) as PrivateKeyEntry
-            return Base64.encodeToString(privateKey.certificate.publicKey.encoded, Base64.DEFAULT)
+        try {
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+            if (keyStore.containsAlias(KEY_ALIAS)) {
+                val privateKey = keyStore.getEntry(KEY_ALIAS, null) as PrivateKeyEntry
+                return Base64.encodeToString(
+                    privateKey.certificate.publicKey.encoded,
+                    Base64.DEFAULT
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return ""
     }
@@ -86,7 +93,13 @@ object AppKey {
         return Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
     }
 
-    fun decrypt(data: String): String? {
+    fun encrypt(byteArray: ByteArray): String {
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        val encryptedBytes = cipher.doFinal(byteArray)
+        return Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
+    }
+
+    fun decrypt(data: String?): String? {
         try {
             cipher.init(Cipher.DECRYPT_MODE, secretKey)
             val encryptedBytes: ByteArray = Base64.decode(data, Base64.DEFAULT)

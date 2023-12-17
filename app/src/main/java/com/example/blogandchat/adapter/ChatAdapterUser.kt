@@ -22,7 +22,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>() {
     private lateinit var listUser: MutableList<User>
     private lateinit var context: Context
-    private lateinit var message: Message
+    private var message: Message? = null
     private lateinit var time: ServerTimestamp
 
     constructor(context: Context, listUser: MutableList<User>) : this() {
@@ -39,7 +39,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
 
         val firebaseModel: User = listUser[position]
-        AppKey.calculateKey(firebaseModel.publicKey.toString())
+     //   AppKey.calculateKey(firebaseModel.publicKey.toString())
 
         Glide.with(context).load(firebaseModel.image).into(holder.avatar)
         holder.nameOfUser.text = firebaseModel.name
@@ -73,19 +73,18 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                 //messageList.clear()
                 for (snapshot1 in snapshot.children) {
                     message = snapshot1.getValue(Message::class.java)!!
-                    if (message != null) {
-                        //messageList.add(message)
-                        //Log.d("hhhhh", "Value is: $message");
-                    }
+                    //messageList.add(message)
+                    //Log.d("hhhhh", "Value is: $message");
                 }
 
-                if (message.senderId == FirebaseAuth.getInstance().uid) {
-                    AppKey.decrypt(message.message)?.let {
-                        holder.lastMessage.text = "Bạn: " + it
+                    if (message?.senderId == FirebaseAuth.getInstance().uid) {
+                        AppKey.decrypt(message?.message)?.let {
+                            holder.lastMessage.text = "Bạn: " + it
+                        }
+                    } else {
+                        AppKey.decrypt(message?.message)?.let { holder.lastMessage.text = it }
                     }
-                } else {
-                    AppKey.decrypt(message.message)?.let { holder.lastMessage.text = it }
-                }
+
 
             }
 

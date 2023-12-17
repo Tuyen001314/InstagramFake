@@ -84,4 +84,6 @@ dependencies {
 
     // For App Authentication API testing
     androidTestImplementation("androidx.security:security-app-authenticator:1.0.0-alpha01")
+
+    implementation 'com.makeramen:roundedimageview:2.3.0'
 }
