@@ -2,20 +2,20 @@ package com.example.blogandchat.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
+import com.example.blogandchat.adapter.MainViewPagerAdapter
 import com.example.blogandchat.databinding.ActivityMainBinding
 import com.example.blogandchat.fragment.*
 import com.example.blogandchat.model.User
@@ -23,10 +23,15 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
+
+    private lateinit var adapter: MainViewPagerAdapter
+
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var user: User
@@ -54,56 +59,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Glide.with(this).load(user.image).into(navImgUser)
         }
 
-        loadFragment(HomeFragment())
+        binding.container.isUserInputEnabled = false
 
-//        binding.bottomNav.setOnItemSelectedListener {it ->
-//            when (it.itemId) {
-//                R.id.home -> {
-//                    val homeFragment = HomeFragment()
-//                    loadFragment(homeFragment)
-//                }
-//                R.id.message -> {
-//                    val chatFragment = ChatFragment()
-//                    loadFragment(chatFragment)
-//                }
-//                R.id.search -> {
-//                    val searchFragment = SearchFragment()
-//                    loadFragment(searchFragment)
-//                }
-//            }
-//            true
-//        }
+        runBlocking {
+            delay(5000)
+        }
 
-//        val appBarConfiguration = AppBarConfiguration(setOf(
-//            androidx.appcompat.R.id.home, R.id.navigation_dashboard, R.id.navigation_notifications))
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-//        navView.setupWithNavController(navController)
-
-//        val appBarConfiguration = AppBarConfiguration(setOf(
-//            R.id.navigation_home, R.id.navigation_favorite, R.id.navigation_search, R.id.navigation_chat ))
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-//        bottomNav.setupWithNavController(navController)
+        adapter = MainViewPagerAdapter(this)
+        binding.container.adapter = adapter
+        binding.container.offscreenPageLimit = 4
 
         binding.bottomNav.setOnItemSelectedListener { id ->
             when (id.itemId) {
                 R.id.home -> {
-                    val homeFragment = HomeFragment()
-                    loadFragment(homeFragment)
+                    binding.container.currentItem = 0
+                    binding.bottomNav.menu[0].isChecked = true
                 }
 
                 R.id.message -> {
-                    val chatFragment = ChatFragment()
-                    loadFragment(chatFragment)
+                    binding.container.currentItem = 3
+                    binding.bottomNav.menu[3].isChecked = true
                 }
 
                 R.id.search -> {
-                    val searchFragment = SearchFragment()
-                    loadFragment(searchFragment)
+                    binding.container.currentItem = 2
+                    binding.bottomNav.menu[2].isChecked = true
                 }
 
                 R.id.favorites -> {
-                    val favoriteFragment = FavoriteFragment()
-                    loadFragment(favoriteFragment)
+                    binding.container.currentItem = 1
+                    binding.bottomNav.menu[1].isChecked = true
                 }
                 else -> {
 
@@ -128,8 +113,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun loadFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
-        // transaction.hide(fragment)
-        transaction.replace(R.id.container, fragment)
+        //transaction.hide(fragment)
+        transaction.add(R.id.container, fragment)
         // transaction.addToBackStack(null)
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         transaction.commit()

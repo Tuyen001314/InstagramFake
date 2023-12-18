@@ -1,6 +1,7 @@
 package com.example.blogandchat.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,13 @@ import com.example.blogandchat.databinding.FragmentSearchBinding
 import com.example.blogandchat.model.ExoPlayerItem
 import com.example.blogandchat.model.Video
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,57 +62,83 @@ class SearchFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_search,container, false)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*val video1 = Video("https://storage.googleapis.com/exoplayer-test-media-0/BigBuckBunny_320x180.mp4")
-        FirebaseDatabase.getInstance().reference.child("videos").push().setValue(video1).addOnCompleteListener {
-            Log.d("buituyen", "success")
-        }
-        val video2 = Video("https://firebasestorage.googleapis.com/v0/b/blogandchat-254f3.appspot.com/o/videos%2FStories%20%E2%80%A2%20Instagram%20-%20Google%20Chrome%202023-12-17%2015-50-20.mp4?alt=media&token=f5bf605b-c365-4b2b-8766-96441f43a9bb")
-        FirebaseDatabase.getInstance().reference.child("videos").push().setValue(video2).addOnCompleteListener {
-            Log.d("buituyen", "success")
-        }
+        CoroutineScope(Dispatchers.IO).launch {
+            val storage = FirebaseStorage.getInstance()
+            val storageRef = storage.reference
+            val videosRef = storageRef.child("videos") // Replace with the path to your videos folder
+            videosRef.listAll()
+                .addOnSuccessListener { listResult ->
+                    val videoFiles = listResult.items
+                    for (videoRef in videoFiles) {
+                        videoRef.downloadUrl
+                            .addOnSuccessListener { uri ->
+                                val downloadUrl = uri.toString()
+                                videos.add(Video(downloadUrl))
+                                Log.d(
+                                    "buituyen videos ",
+                                    downloadUrl
+                                )
+                                Log.d("buituyen", "min addOnCompleteListener")
 
-        val options: FirebaseRecyclerOptions<Video> =
-            FirebaseRecyclerOptions.Builder<Video>()
-                .setQuery(
-                    FirebaseDatabase.getInstance().reference.child("videos"),
-                    Video::class.java,
-                )
-                .build()
+                                // Use the download URL as needed (e.g., display in a list or store in a database)
+                            }
+                            .addOnFailureListener { exception ->
+                                // Handle any errors that occurred while retrieving the download URL
+                                Log.d("buituyen", "error addOnCompleteListener")
+                            }
+                        /*delay(10000)
+                        Log.d("buituyen size", videos.size.toString())*/
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    // Handle any errors that occurred while listing the video files
+                    Log.d("buituyen", "max addOnCompleteListener")
 
-        Log.d("buituyen", options.snapshots.size.toString())*/
+                }.addOnCompleteListener {
 
-        videos.add(
-            Video(
-                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            )
-        )
+                    Log.d("buituyen", "max addOnCompleteListener")
+                }
 
-        videos.add(
-            Video(
-                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-            )
-        )
+            withContext(Dispatchers.Main) {
+                delay(10000)
+                adapter = VideoAdapter2(
+                    requireContext(),
+                    videos,
+                    object : VideoAdapter2.OnVideoPreparedListener {
+                        override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
+                            exoPlayerItems.add(exoPlayerItem)
+                        }
+                    })
 
-        videos.add(
-            Video(
-                "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-            )
-        )
-
-        adapter = VideoAdapter2(requireContext(), videos, object : VideoAdapter2.OnVideoPreparedListener {
-            override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
-                exoPlayerItems.add(exoPlayerItem)
+                binding.viewPager.adapter = adapter
             }
-        })
+        }
 
-        binding.viewPager.adapter = adapter
 
+        /* videos.add(
+             Video(
+                 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+             )
+         )
+
+         videos.add(
+             Video(
+                 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+             )
+         )
+
+         videos.add(
+             Video(
+                 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+             )
+         )*/
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer.isPlaying }
