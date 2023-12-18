@@ -45,6 +45,8 @@ class SpecificChat : AppCompatActivity() {
     lateinit var getContent: ActivityResultLauncher<String>
     private lateinit var mGetContent: ActivityResultLauncher<String>
     val REQUEST_IMAGE_CAPTURE = 1
+    val REQUEST_IMAGE_PICKER = 2
+
     private val viewModel: ChatViewModel by viewModels()
     var mSenderUid: String = ""
     var mReceiverUid: String = ""
@@ -54,9 +56,9 @@ class SpecificChat : AppCompatActivity() {
     lateinit var databaseReference: DatabaseReference
     val postListener = object : ChildEventListener {
         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val message: Message? = snapshot.getValue(Message::class.java)
-                if (message != null && !messageList.contains(message)) {
-                    messageList.add(message)
+            val message: Message? = snapshot.getValue(Message::class.java)
+            if (message != null && !messageList.contains(message)) {
+                messageList.add(message)
             }
             messagesAdapter.notifyDataSetChanged()
             binding.recycleChat.scrollToPosition(messageList.size - 1)
@@ -72,7 +74,7 @@ class SpecificChat : AppCompatActivity() {
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
-            Log.e(">>>>>>>>>>>>>", databaseError.message )
+            Log.e(">>>>>>>>>>>>>", databaseError.message)
 
         }
     }
@@ -86,6 +88,9 @@ class SpecificChat : AppCompatActivity() {
             this,
             R.layout.activity_specific_chat
         )
+
+        requestPermission()
+
 
         mSenderUid = firebaseAuth.uid.toString()
         mReceiverUid = intent.getStringExtra("receiveruid").toString()
@@ -126,7 +131,11 @@ class SpecificChat : AppCompatActivity() {
         }
 
         binding.imgNew.setOnClickListener {
-            requestPermission()
+            dispatchTakePictureIntent()
+        }
+
+        binding.imgPick.setOnClickListener {
+            openGalleryForImage()
         }
 
 
@@ -189,29 +198,63 @@ class SpecificChat : AppCompatActivity() {
                 receiverRoom = receiverRoom
             )
         }
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_IMAGE_PICKER) {
+
+            data?.data?.let {
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, it);
+                viewModel.uploadImage(
+                    bitmap, senderRoom = senderRoom,
+                    mReceiverUid = mReceiverUid,
+                    receiverRoom = receiverRoom
+                )
+            }
+
+        }
+
     }
 
     fun requestPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_DENIED
-        ) {
+        val permissions: Array<String> = try {
+            val info = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+            val requestedPermissions = info.requestedPermissions
+            if (requestedPermissions != null && requestedPermissions.isNotEmpty()) {
+                requestedPermissions
+            } else {
+                arrayOf()
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            arrayOf()
+        }
 
-            ActivityCompat.requestPermissions(
-                this,
-                listOf(Manifest.permission.CAMERA).toTypedArray(),
-                99
-            );
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission,
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
         }
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_DENIED
-        ) {
-            dispatchTakePictureIntent()
-        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+//            == PackageManager.PERMISSION_DENIED
+//        ) {
+//
+//            ActivityCompat.requestPermissions(
+//                this,
+//                listOf(Manifest.permission.CAMERA).toTypedArray(),
+//                99
+//            );
+//        }
     }
 
     private fun dispatchTakePictureIntent() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            return
+        }
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(packageManager) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
@@ -219,6 +262,12 @@ class SpecificChat : AppCompatActivity() {
             // Thông báo cho người dùng rằng không có ứng dụng camera nào được cài đặt
             Toast.makeText(this, "Không tìm thấy ứng dụng camera", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun openGalleryForImage() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_IMAGE_PICKER)
     }
 
 

@@ -29,7 +29,7 @@ class ChatListViewModel() : ViewModel() {
                       for (document in data) {
                           val idUserReceive = document.id
                           this.launch {
-                              FirebaseFirestore.getInstance().collection("users")
+                              firebaseFirestore.collection("users")
                                   .document(idUserReceive)
                                   .get().addOnSuccessListener { document ->
                                       if (document != null) {
