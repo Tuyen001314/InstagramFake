@@ -13,16 +13,19 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blogandchat.OnClickImage
 import com.example.blogandchat.PostDetailListener
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.AddPostActivity
 import com.example.blogandchat.activity.CommentActivity
 import com.example.blogandchat.adapter.PostAdapter
+import com.example.blogandchat.databinding.DialogCommentBinding
 import com.example.blogandchat.databinding.FragmentHomeBinding
 import com.example.blogandchat.dialog.CommentDialogFragment
 import com.example.blogandchat.home.HomeViewModel
 import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.PostDetailModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 
@@ -100,7 +103,7 @@ class HomeFragment : Fragment() {
         }
 
         adapter = activity?.let {
-            PostAdapter(context = requireContext(), onClickImage = object : PostDetailListener {
+            PostAdapter(it, postList, object : OnClickImage {
                 override fun click(id: String) {
                     val transaction = fragmentManager?.beginTransaction()
                     if (transaction != null) {
@@ -110,22 +113,23 @@ class HomeFragment : Fragment() {
                         transaction.commit()
                     }
                 }
-
-                override fun like(id: String) {
-                    viewModel.likeImage(id)
-                }
             })
         }!!
+
+        adapter.onCLickComment {postId, id ->
+            CommentDialogFragment.show(childFragmentManager, postId = postId, uId = id)
+        }
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
 
 
-        viewModel.postDetails.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+        /*viewModel.postDetails.observe(viewLifecycleOwner) {
+            adapter.listPost.clear()
+            adapter.listPost.addAll(le)
             adapter.notifyDataSetChanged()
-        }
+        }*/
 //        if (viewModel.listState != null){
 //            recyclerView.layoutManager?.onRestoreInstanceState(viewModel.listState)
 //            viewModel.listState = null
