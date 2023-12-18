@@ -16,8 +16,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.PostDetailListener
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.AddPostActivity
+import com.example.blogandchat.activity.CommentActivity
 import com.example.blogandchat.adapter.PostAdapter
 import com.example.blogandchat.databinding.FragmentHomeBinding
+import com.example.blogandchat.dialog.CommentDialogFragment
 import com.example.blogandchat.home.HomeViewModel
 import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.PostDetailModel

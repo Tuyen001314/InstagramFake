@@ -17,4 +17,8 @@
     <color name="message">#A5D6A7</color>
     <color name="favorites">#F44336</color>
     <color name="sky">#5190C3</color>
+
+    <color name="selected_icon_color">#FFFFFF</color>
+    <color name="unselected_icon_color">#808080</color>
+    <color name="selected_text_color">@color/black</color>
 </resources>

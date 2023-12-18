@@ -39,7 +39,7 @@ class SettingActivity : AppCompatActivity() {
         docRef.get().addOnSuccessListener { documentSnapshot ->
             user = documentSnapshot.toObject<com.example.blogandchat.model.User>()!!
 
-            binding.edtNameEnter.text = user.name
+            //binding.edtNameEnter.text = user.name
             Glide.with(this).load(user.image).into(binding.circleImageView)
         }
 
