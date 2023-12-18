@@ -43,6 +43,7 @@ class SpecificChat : AppCompatActivity() {
     private lateinit var messagesAdapter: MessageAdapter
     private lateinit var binding: ActivitySpecificChatBinding
     lateinit var getContent: ActivityResultLauncher<String>
+    private lateinit var mGetContent: ActivityResultLauncher<String>
     val REQUEST_IMAGE_CAPTURE = 1
     private val viewModel: ChatViewModel by viewModels()
     var mSenderUid: String = ""
@@ -50,6 +51,31 @@ class SpecificChat : AppCompatActivity() {
     var mReceiverName: String = ""
     var senderRoom = ""
     var receiverRoom = ""
+    lateinit var databaseReference: DatabaseReference
+    val postListener = object : ChildEventListener {
+        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val message: Message? = snapshot.getValue(Message::class.java)
+                if (message != null && !messageList.contains(message)) {
+                    messageList.add(message)
+            }
+            messagesAdapter.notifyDataSetChanged()
+            binding.recycleChat.scrollToPosition(messageList.size - 1)
+        }
+
+        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+        }
+
+        override fun onChildRemoved(snapshot: DataSnapshot) {
+        }
+
+        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.e(">>>>>>>>>>>>>", databaseError.message )
+
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,43 +99,14 @@ class SpecificChat : AppCompatActivity() {
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         binding.recycleChat.layoutManager = linearLayoutManager
 
-         senderRoom = mSenderUid + mReceiverUid
-         receiverRoom = mReceiverUid + mSenderUid
+        senderRoom = mSenderUid + mReceiverUid
+        receiverRoom = mReceiverUid + mSenderUid
 
-        val databaseReference: DatabaseReference =
-            firebaseDatabase.reference.child("chats").child(senderRoom)
-                .child("messages")
+        databaseReference =
+            firebaseDatabase.reference.child("chats").child(senderRoom).child("messages")
 
-        val postListener = object : ValueEventListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onDataChange(snapshot: DataSnapshot) {
-                // Get Post object and use the values to update the UI
-                //val post = dataSnapshot.value
-//                if (post != null) {
-//                    messageList.add(post)
-//                }
-                messageList.clear()
-                for (snapshot1 in snapshot.children) {
-                    val message: Message? = snapshot1.getValue(Message::class.java)
-                    if (message != null) {
-                        messageList.add(message)
-                        Log.e(">>>>>>>>>>>>", "Value is: $message");
-                    }
-                }
-
-                messagesAdapter.notifyDataSetChanged()
-                // ...
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Getting Post failed, log a message
-                //Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        }
 
         messagesAdapter = MessageAdapter(this@SpecificChat, messageList)
-
-        databaseReference.addValueEventListener(postListener)
 
         binding.recycleChat.adapter = messagesAdapter
 
@@ -153,13 +150,13 @@ class SpecificChat : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onStart() {
         super.onStart()
-        messagesAdapter.notifyDataSetChanged()
+        databaseReference.addChildEventListener(postListener)
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onStop() {
+        databaseReference.removeEventListener(postListener)
         super.onStop()
-        messagesAdapter.notifyDataSetChanged()
     }
 
     fun hideSoftKeyboard(activity: Activity?) {
@@ -175,7 +172,7 @@ class SpecificChat : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (currentFocus != null) {
+        if (currentFocus != null && !ev.isButtonPressed(binding.imageBtnChat.id)) {
             hideSoftKeyboard(this)
         }
         return super.dispatchTouchEvent(ev)

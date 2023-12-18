@@ -1,7 +1,8 @@
 package com.example.blogandchat.activity
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.blogandchat.model.Message
@@ -20,21 +21,17 @@ import java.util.Date
 
 
 class ChatViewModel : ViewModel() {
-    val calendar = Calendar.getInstance()
-    val simpleDateFormat = SimpleDateFormat("hh:mm a")
+    private val calendar = Calendar.getInstance()
+    private val simpleDateFormat = SimpleDateFormat("hh:mm a")
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
-
-
     fun uploadImage(
         bitmap: Bitmap,
         senderRoom: String,
         mReceiverUid: String?,
         receiverRoom: String,
     ) {
-        CoroutineScope(IO).launch {
-//            val stream = ByteArrayOutputStream()
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        viewModelScope.launch {
             val enterdMessage = optimizeAndConvertImageToByteArray(bitmap)
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
@@ -82,7 +79,6 @@ class ChatViewModel : ViewModel() {
         receiverRoom: String,
     ) {
         viewModelScope.launch {
-
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
             val message = firebaseAuth.uid?.let { it1 ->
