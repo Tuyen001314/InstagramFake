@@ -23,11 +23,10 @@ class ChatListViewModel() : ViewModel() {
     fun fetchListUser() {
         val id = firebaseAuth.uid
         viewModelScope.launch {
-            firebaseFirestore.collection("users/$id/message")
-                .get().addOnSuccessListener { documents ->
+            val data =  firebaseFirestore.collection("users/$id/message").get().await()
                  job = this.async {
                       val list = mutableListOf<User>()
-                      for (document in documents) {
+                      for (document in data) {
                           val idUserReceive = document.id
                           this.launch {
                               FirebaseFirestore.getInstance().collection("users")
@@ -41,8 +40,6 @@ class ChatListViewModel() : ViewModel() {
                       }
                       list
                   }
-                }.await()
-
             _listUser.postValue(job.await())
         }
 

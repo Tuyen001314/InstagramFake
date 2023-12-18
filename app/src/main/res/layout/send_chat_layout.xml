@@ -9,6 +9,7 @@
     android:layout_height="wrap_content">
 
     <RelativeLayout
+        android:id="@+id/relative_parent"
         android:paddingStart="3dp"
         android:paddingEnd="3dp"
         android:layout_width="wrap_content"

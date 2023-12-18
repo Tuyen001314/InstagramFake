@@ -27,6 +27,7 @@ import com.example.blogandchat.R
 import com.example.blogandchat.adapter.MessageAdapter
 import com.example.blogandchat.databinding.ActivitySpecificChatBinding
 import com.example.blogandchat.model.Message
+import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.io.ByteArrayOutputStream
@@ -64,7 +65,7 @@ class SpecificChat : AppCompatActivity() {
         mReceiverUid = intent.getStringExtra("receiveruid").toString()
         mReceiverName = intent.getStringExtra("name").toString()
         val publicKey = intent.getStringExtra("publicKey")
-        //  AppKey.calculateKey(publicKey.toString())
+        AppKey.calculateKey(publicKey.toString())
 
 
         val linearLayoutManager = LinearLayoutManager(this)
@@ -119,7 +120,7 @@ class SpecificChat : AppCompatActivity() {
         if (uri!!.isEmpty()) {
             Toast.makeText(applicationContext, "null is received", Toast.LENGTH_SHORT).show()
         } else {
-            Glide.with(this).load(uri).into(binding.imageUserChat)
+            Glide.with(this).load(uri).into(binding.imgAvt)
         }
 
         binding.edtChat.onFocusChangeListener = OnFocusChangeListener { p0, p1 ->
@@ -185,15 +186,11 @@ class SpecificChat : AppCompatActivity() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val extras = data?.extras
             val bitmap = extras?.get("data") as Bitmap
-            val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            val enterdMessage = stream.toByteArray()
-            println(Arrays.toString(enterdMessage))
-//            viewModel.uploadImage(
-//                bitmap, senderRoom = senderRoom,
-//                mReceiverUid = mReceiverUid,
-//                receiverRoom = receiverRoom
-//            )
+            viewModel.uploadImage(
+                bitmap, senderRoom = senderRoom,
+                mReceiverUid = mReceiverUid,
+                receiverRoom = receiverRoom
+            )
         }
     }
 

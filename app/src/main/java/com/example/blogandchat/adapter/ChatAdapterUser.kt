@@ -39,7 +39,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
 
         val firebaseModel: User = listUser[position]
-     //   AppKey.calculateKey(firebaseModel.publicKey.toString())
+        AppKey.calculateKey(firebaseModel.publicKey.toString())
 
         Glide.with(context).load(firebaseModel.image).into(holder.avatar)
         holder.nameOfUser.text = firebaseModel.name
@@ -50,7 +50,6 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
         }
 
         holder.itemView.setOnClickListener(View.OnClickListener { v ->
-
             val intent = Intent(v.context, SpecificChat::class.java)
             intent.putExtra("name", firebaseModel.name)
             intent.putExtra("receiveruid", firebaseModel.id)
@@ -76,7 +75,7 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                     //messageList.add(message)
                     //Log.d("hhhhh", "Value is: $message");
                 }
-
+                if (message?.type != 1) {
                     if (message?.senderId == FirebaseAuth.getInstance().uid) {
                         AppKey.decrypt(message?.message)?.let {
                             holder.lastMessage.text = "Bạn: " + it
@@ -84,6 +83,13 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
                     } else {
                         AppKey.decrypt(message?.message)?.let { holder.lastMessage.text = it }
                     }
+                } else {
+                    if (message?.senderId == FirebaseAuth.getInstance().uid) {
+                        holder.lastMessage.text = "Bạn: Hình ảnh"
+                    } else {
+                        holder.lastMessage.text = "Hình ảnh"
+                    }
+                }
 
 
             }

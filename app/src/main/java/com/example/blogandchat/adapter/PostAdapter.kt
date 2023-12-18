@@ -50,7 +50,7 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
             LayoutInflater.from(parent.context).inflate(R.layout.each_post, parent, false)
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
-        return ViewHolder(view, onClickImage)
+        return ViewHolder(view)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -58,7 +58,7 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
         val post: PostDetailModel = getItem(position)
         Glide.with(context).load(post.image).into(holder.postPic)
 
-        holder.bindData(post.image)
+        holder.bindData(post.image, onClickImage)
 
         holder.setPostCaption(post.caption)
 
@@ -149,7 +149,7 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
     }
 
 
-    class ViewHolder(itemView: View, private val onClickImage: PostDetailListener) :
+    class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
         val likeImage: ImageView = itemView.findViewById(R.id.img_view_like)
@@ -166,7 +166,7 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
 //            postLikes.text = "$count Likes"
 //        }
 
-        fun bindData(id: String) {
+        fun bindData(id: String, onClickImage: PostDetailListener) {
             postPic.setOnClickListener {
                 onClickImage.click(id)
                 //Log.d("image", id.toString() + "")
