@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.media.Image
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -76,6 +77,10 @@ class PostAdapter(
             }
         }
 
+        holder.sharePost.setOnClickListener{
+                onClickImage.share(post.image)
+        }
+
         if (post.isYour) {
             holder.deletePost.visibility = View.VISIBLE
             holder.deletePost.setOnClickListener {
@@ -129,13 +134,7 @@ class PostAdapter(
         }
 
         holder.commentPost.setOnClickListener {
-            Log.e(">>>>>>>", post.postId.toString() )
-
             onClickImage.comment(post.postId.toString(), FirebaseAuth.getInstance().uid.toString())
-//            val intent = Intent(context, CommentActivity::class.java)
-//            intent.putExtra("id", post.postId)
-//            intent.putExtra("userId", FirebaseAuth.getInstance().uid)
-//            context.startActivity(intent)
         }
 
 
@@ -164,6 +163,7 @@ class PostAdapter(
         val profilePic: CircleImageView = itemView.findViewById(R.id.profile_pic)
         val deletePost: ImageView = itemView.findViewById(R.id.image_button_delete)
         val commentPost: ImageView = itemView.findViewById(R.id.img_view_comment)
+        val sharePost: ImageView = itemView.findViewById(R.id.img_share)
 
 //        fun setPostLikes(count: Int) {
 //            val postLikes = mView.tv_count_like

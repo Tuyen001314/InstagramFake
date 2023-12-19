@@ -3,13 +3,13 @@ package com.example.blogandchat.model
 import android.os.Parcel
 import android.os.Parcelable
 
-data class User(
+open class User(
     val id: String = "",
     val name: String = "",
     val email: String = "",
     val image: String = "",
     val status: String = "",
-    val publicKey: String? = ""
+    val publicKey: String? = "",
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,

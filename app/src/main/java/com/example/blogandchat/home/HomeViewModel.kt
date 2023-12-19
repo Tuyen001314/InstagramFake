@@ -9,9 +9,11 @@ import com.example.blogandchat.R
 import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.PostDetailModel
 import com.example.blogandchat.model.PostId
+import com.example.blogandchat.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.HashMap
@@ -19,6 +21,8 @@ import java.util.HashMap
 class HomeViewModel : ViewModel() {
     private val _postDetails = MutableLiveData(mutableListOf<PostDetailModel>())
     val postDetails: LiveData<MutableList<PostDetailModel>> = _postDetails
+    private val _listFriend = MutableLiveData(mutableListOf<User>())
+    val listFriend: LiveData<MutableList<User>> = _listFriend
     private val fireStore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val idUser = FirebaseAuth.getInstance().uid
@@ -39,21 +43,22 @@ class HomeViewModel : ViewModel() {
                             userName = task.result.getString("name")
                             imageUser = task.result.getString("image")
                             idUserPost = task.result.getString("id")
+
+                            if (idUser != null) {
+                                fireStore.collection(
+                                    "posts/" +
+                                            postID + "/likes"
+                                ).document(idUser).addSnapshotListener { snapshot, e ->
+                                    if (e == null) {
+                                        if (snapshot != null) {
+                                            isLiked = snapshot.exists()
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }.await()
 
-                if (idUser != null) {
-                    fireStore.collection(
-                        "posts/" +
-                                postID + "/likes"
-                    ).document(idUser).addSnapshotListener { snapshot, e ->
-                        if (e == null) {
-                            if (snapshot != null) {
-                                isLiked = snapshot.exists()
-                            }
-                        }
-                    }
-                }
                 val postDetail = PostDetailModel(
                     image = it.image,
                     caption = it.caption,
@@ -92,6 +97,24 @@ class HomeViewModel : ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    fun getFriends() {
+        viewModelScope.launch {
+            val job = viewModelScope.async {
+                val listFriend = mutableListOf<User>()
+                val data = fireStore.collection("users/$idUser/friends").get().await()
+                for (item in data) {
+                    fireStore.collection("users").document(item.id).get().addOnSuccessListener {
+                        val user = it.toObject(User::class.java)
+                        println(user?.name.toString())
+                        user?.let { it1 -> listFriend.add(it1) }
+                    }.await()
+                }
+                listFriend
+            }
+            _listFriend.postValue(job.await())
         }
     }
 }

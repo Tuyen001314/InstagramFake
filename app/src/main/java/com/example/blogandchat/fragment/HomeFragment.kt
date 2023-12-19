@@ -3,6 +3,7 @@ package com.example.blogandchat.fragment
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.PostDetailListener
@@ -20,11 +22,18 @@ import com.example.blogandchat.activity.CommentActivity
 import com.example.blogandchat.adapter.PostAdapter
 import com.example.blogandchat.databinding.FragmentHomeBinding
 import com.example.blogandchat.dialog.CommentDialogFragment
+import com.example.blogandchat.dialog.ShareDialogFragment
 import com.example.blogandchat.home.HomeViewModel
 import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.PostDetailModel
+import com.example.blogandchat.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newCoroutineContext
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -101,7 +110,8 @@ class HomeFragment : Fragment() {
                 })
         }
 
-        adapter = PostAdapter(context = requireContext(), onClickImage = object : PostDetailListener {
+        adapter =
+            PostAdapter(context = requireContext(), onClickImage = object : PostDetailListener {
                 override fun click(id: String) {
                     val transaction = fragmentManager?.beginTransaction()
                     if (transaction != null) {
@@ -121,6 +131,11 @@ class HomeFragment : Fragment() {
                     CommentDialogFragment.show(childFragmentManager, postId = postId, uId = id)
 
                 }
+
+                override fun share(url: String) {
+                    viewModel.getFriends()
+                }
+
             }, firestore = firestore, auth = auth)
 
         binding.recyclerView.setHasFixedSize(true)
@@ -128,9 +143,17 @@ class HomeFragment : Fragment() {
         binding.recyclerView.adapter = adapter
 
 
-        viewModel.postDetails.observe(viewLifecycleOwner) {
+        viewModel.postDetails.observe(viewLifecycleOwner)
+        {
             adapter.submitList(it)
             adapter.notifyDataSetChanged()
+        }
+        viewModel.listFriend.observe(viewLifecycleOwner) {
+            if (!it.isNullOrEmpty()) {
+                val dialog = ShareDialogFragment.newInstance(it as ArrayList<User>)
+                dialog.show(childFragmentManager, "SHARE_DIALOG_FRAGMENT")
+            }
+
         }
 //        if (viewModel.listState != null){
 //            recyclerView.layoutManager?.onRestoreInstanceState(viewModel.listState)
