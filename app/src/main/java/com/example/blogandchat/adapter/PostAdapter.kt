@@ -27,7 +27,10 @@ import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 
 
-class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
+class PostAdapter(
+    val onClickImage: PostDetailListener, val context: Context, var firestore: FirebaseFirestore,
+    var auth: FirebaseAuth,
+) :
     ListAdapter<PostDetailModel, PostAdapter.ViewHolder>(object :
         DiffUtil.ItemCallback<PostDetailModel>() {
         override fun areItemsTheSame(oldItem: PostDetailModel, newItem: PostDetailModel): Boolean {
@@ -38,18 +41,15 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
             oldItem: PostDetailModel,
             newItem: PostDetailModel,
         ): Boolean {
-            return oldItem.caption == newItem.caption && oldItem.isLiked == newItem.isLiked && oldItem.image == newItem.image
+            return oldItem.caption == newItem.caption && oldItem.time == newItem.time
         }
 
     }) {
-    private lateinit var firestore: FirebaseFirestore
-    private lateinit var auth: FirebaseAuth
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View =
             LayoutInflater.from(parent.context).inflate(R.layout.each_post, parent, false)
-        firestore = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
         return ViewHolder(view)
     }
 

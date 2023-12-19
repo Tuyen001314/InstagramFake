@@ -63,6 +63,8 @@ class HomeFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val firestore = FirebaseFirestore.getInstance()
+        val auth = FirebaseAuth.getInstance()
         binding.floatingActionButton.setOnClickListener(View.OnClickListener {
             startActivity(
                 Intent(
@@ -114,7 +116,7 @@ class HomeFragment : Fragment() {
                 override fun like(id: String) {
                     viewModel.likeImage(id)
                 }
-            })
+            }, firestore = firestore, auth = auth)
         }!!
 
         binding.recyclerView.setHasFixedSize(true)

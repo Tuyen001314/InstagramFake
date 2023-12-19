@@ -35,6 +35,8 @@ class ChatFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerView1: RecyclerView
     private var list: MutableList<User> = ArrayList()
+    private var list1: MutableList<User> = ArrayList()
+
     private lateinit var adapter: ChatAdapter
     private lateinit var adapterUser: ChatAdapterUser
 
@@ -60,26 +62,25 @@ class ChatFragment : Fragment() {
         val searchChat: SearchView = view.findViewById(R.id.searchChat)
 
 
-
-        adapter = activity?.let { ChatAdapter(it, list) }!!
+        adapter = ChatAdapter(requireContext(), list)
         recyclerView.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = RecyclerView.HORIZONTAL
         recyclerView.layoutManager = linearLayoutManager
         recyclerView.adapter = adapter
-        adapter.notifyDataSetChanged()
 
-        adapterUser = activity?.let { ChatAdapterUser(it, list) }!!
+        adapterUser = ChatAdapterUser(requireContext(), list1)
         recyclerView1.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         recyclerView1.layoutManager = linearLayoutManager
         recyclerView1.adapter = adapterUser
-        adapterUser.notifyDataSetChanged()
 
         viewModel.listUser.observe(viewLifecycleOwner) {
             list.clear()
             list.addAll(it)
+            list1.clear()
+            list1.addAll(it)
             adapterUser.notifyDataSetChanged()
             adapter.notifyDataSetChanged()
         }

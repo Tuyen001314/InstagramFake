@@ -54,23 +54,18 @@ class SpecificChat : AppCompatActivity() {
     var senderRoom = ""
     var receiverRoom = ""
     lateinit var databaseReference: DatabaseReference
-    val postListener = object : ChildEventListener {
-        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-            val message: Message? = snapshot.getValue(Message::class.java)
-            if (message != null && !messageList.contains(message)) {
-                messageList.add(message)
+    val postListener = object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            messageList.clear()
+            for (snapshot1 in snapshot.children) {
+                val message: Message? = snapshot1.getValue(Message::class.java)
+                if (message != null &&  !messageList.contains(message)) {
+                    messageList.add(message)
+                    Log.e(">>>>>>>>>>>>", "Value is: $message");
+                }
             }
             messagesAdapter.notifyDataSetChanged()
             binding.recycleChat.scrollToPosition(messageList.size - 1)
-        }
-
-        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-        }
-
-        override fun onChildRemoved(snapshot: DataSnapshot) {
-        }
-
-        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
@@ -159,7 +154,7 @@ class SpecificChat : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onStart() {
         super.onStart()
-        databaseReference.addChildEventListener(postListener)
+        databaseReference.addValueEventListener(postListener)
     }
 
     @SuppressLint("NotifyDataSetChanged")
