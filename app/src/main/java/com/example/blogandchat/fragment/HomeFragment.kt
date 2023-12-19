@@ -24,6 +24,7 @@ import com.example.blogandchat.databinding.FragmentHomeBinding
 import com.example.blogandchat.dialog.CommentDialogFragment
 import com.example.blogandchat.dialog.ShareDialogFragment
 import com.example.blogandchat.home.HomeViewModel
+import com.example.blogandchat.model.Comments
 import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.PostDetailModel
 import com.example.blogandchat.model.User
@@ -75,12 +76,14 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val firestore = FirebaseFirestore.getInstance()
         val auth = FirebaseAuth.getInstance()
-        binding.floatingActionButton.setOnClickListener(View.OnClickListener {
+        binding.floatingActionButton.setOnClickListener(View.OnClickListener {4
+            val intent = Intent(
+                context,
+                AddPostActivity::class.java
+            )
+            intent.putExtra("TYPE", "IMAGE")
             startActivity(
-                Intent(
-                    context,
-                    AddPostActivity::class.java
-                )
+              intent
             )
         })
 
@@ -144,6 +147,7 @@ class HomeFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
 
+        getDataComment()
 
         viewModel.postDetails.observe(viewLifecycleOwner)
         {
@@ -170,4 +174,24 @@ class HomeFragment : Fragment() {
 //        viewModel.listState = recyclerView.layoutManager?.onSaveInstanceState()
 //    }
 
+    private fun getDataComment() {
+        /*val query = FirebaseFirestore.getInstance().collection("posts/$postId/comments")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+        listenerRegistration = query.addSnapshotListener(
+            EventListener<QuerySnapshot?> { value, _ ->
+                for (doc in value!!.documentChanges) {
+                    if (doc.type == DocumentChange.Type.ADDED) {
+                        val commentsId = doc.document.id
+                        val comments: Comments =
+                            doc.document.toObject(Comments::class.java).withId(commentsId)
+                        listComments.add(comments)
+                        adapter.notifyDataSetChanged()
+                    } else {
+                        adapter.notifyDataSetChanged()
+                    }
+                }
+                listenerRegistration.remove()
+            },
+        )*/
+    }
 }

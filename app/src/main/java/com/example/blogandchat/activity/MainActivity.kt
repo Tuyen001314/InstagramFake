@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.message -> {
-                    binding.pagger2.currentItem = 2
+                    binding.pagger2.currentItem = 3
                     true
                 }
 
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         pagerAdapter = FragmentNavigator(this.supportFragmentManager, lifecycle)
         pagerAdapter.addFragment(homeFragment)
         pagerAdapter.addFragment(favoriteFragment)
-        //pagerAdapter.addFragment(searchFragment)
+        pagerAdapter.addFragment(searchFragment)
         pagerAdapter.addFragment(chatFragment)
         binding.pagger2.offscreenPageLimit = pagerAdapter.itemCount
         binding.pagger2.adapter = pagerAdapter

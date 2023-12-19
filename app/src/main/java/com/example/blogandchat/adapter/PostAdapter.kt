@@ -48,7 +48,6 @@ class PostAdapter(
 
     }) {
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View =
             LayoutInflater.from(parent.context).inflate(R.layout.each_post, parent, false)
