@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,7 +42,7 @@ class PostAdapter(
             oldItem: PostDetailModel,
             newItem: PostDetailModel,
         ): Boolean {
-            return oldItem.caption == newItem.caption && oldItem.time == newItem.time
+            return oldItem.postId == newItem.postId && oldItem.time == newItem.time
         }
 
     }) {
@@ -128,10 +129,13 @@ class PostAdapter(
         }
 
         holder.commentPost.setOnClickListener {
-            val intent = Intent(context, CommentActivity::class.java)
-            intent.putExtra("id", post.postId)
-            intent.putExtra("userId", FirebaseAuth.getInstance().uid)
-            context.startActivity(intent)
+            Log.e(">>>>>>>", post.postId.toString() )
+
+            onClickImage.comment(post.postId.toString(), FirebaseAuth.getInstance().uid.toString())
+//            val intent = Intent(context, CommentActivity::class.java)
+//            intent.putExtra("id", post.postId)
+//            intent.putExtra("userId", FirebaseAuth.getInstance().uid)
+//            context.startActivity(intent)
         }
 
 
