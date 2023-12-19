@@ -69,7 +69,7 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        CoroutineScope(Dispatchers.IO).launch {
+       /* CoroutineScope(Dispatchers.IO).launch {
             val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference
             val videosRef = storageRef.child("videos") // Replace with the path to your videos folder
@@ -93,8 +93,8 @@ class SearchFragment : Fragment() {
                                 // Handle any errors that occurred while retrieving the download URL
                                 Log.d("buituyen", "error addOnCompleteListener")
                             }
-                        /*delay(10000)
-                        Log.d("buituyen size", videos.size.toString())*/
+                        *//*delay(10000)
+                        Log.d("buituyen size", videos.size.toString())*//*
                     }
                 }
                 .addOnFailureListener { exception ->
@@ -108,37 +108,47 @@ class SearchFragment : Fragment() {
 
             withContext(Dispatchers.Main) {
                 delay(10000)
-                adapter = VideoAdapter2(
-                    requireContext(),
-                    videos,
-                    object : VideoAdapter2.OnVideoPreparedListener {
-                        override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
-                            exoPlayerItems.add(exoPlayerItem)
-                        }
-                    })
-
-                binding.viewPager.adapter = adapter
             }
-        }
+        }*/
 
 
-        /* videos.add(
+         videos.add(
              Video(
-                 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                 "https://www.shutterstock.com/shutterstock/videos/1100819565/preview/stock-footage--shanghai-china-cityscape-above-the-pudong-financial-district-hyper-lapse-video.webm"
              )
          )
 
          videos.add(
              Video(
-                 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+                 "https://www.shutterstock.com/shutterstock/videos/1076037986/preview/stock-footage-aerial-view-of-sunrise-through-airliner-window-in-the-morning-aerial-view-of-cloudscape-in-dawn.webm"
              )
          )
-
          videos.add(
              Video(
                  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
              )
-         )*/
+         )
+        videos.add(
+            Video(
+                "https://www.shutterstock.com/shutterstock/videos/1086628187/preview/stock-footage-aerial-footage-of-beautiful-mountain-and-river-natural-scenery-in-guilin-at-sunrise-china-lijiang.webm"
+            )
+        )
+        videos.add(
+            Video(
+                "https://www.shutterstock.com/shutterstock/videos/1108575273/preview/stock-footage-aerial-shot-of-the-great-wall-of-china-at-sunrise.webm"
+            )
+        )
+
+        adapter = VideoAdapter2(
+            requireContext(),
+            videos,
+            object : VideoAdapter2.OnVideoPreparedListener {
+                override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
+                    exoPlayerItems.add(exoPlayerItem)
+                }
+            })
+
+        binding.viewPager.adapter = adapter
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer.isPlaying }

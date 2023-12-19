@@ -59,36 +59,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Glide.with(this).load(user.image).into(navImgUser)
         }
 
-        binding.container.isUserInputEnabled = false
-
-        runBlocking {
-            delay(5000)
-        }
-
-        adapter = MainViewPagerAdapter(this)
-        binding.container.adapter = adapter
-        binding.container.offscreenPageLimit = 4
+        //binding.container.isUserInputEnabled = false
 
         binding.bottomNav.setOnItemSelectedListener { id ->
             when (id.itemId) {
                 R.id.home -> {
-                    binding.container.currentItem = 0
-                    binding.bottomNav.menu[0].isChecked = true
+                    val homeFragment = HomeFragment()
+                    loadFragment(homeFragment)
                 }
 
                 R.id.message -> {
-                    binding.container.currentItem = 3
-                    binding.bottomNav.menu[3].isChecked = true
+                    val chatFragment = ChatFragment()
+                    loadFragment(chatFragment)
                 }
 
                 R.id.search -> {
-                    binding.container.currentItem = 2
-                    binding.bottomNav.menu[2].isChecked = true
+                    val searchFragment = SearchFragment()
+                    loadFragment(searchFragment)
                 }
 
                 R.id.favorites -> {
-                    binding.container.currentItem = 1
-                    binding.bottomNav.menu[1].isChecked = true
+                    val favoriteFragment = FavoriteFragment()
+                    loadFragment(favoriteFragment)
                 }
                 else -> {
 
@@ -114,7 +106,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun loadFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
         //transaction.hide(fragment)
-        transaction.add(R.id.container, fragment)
+        transaction.replace(R.id.container, fragment)
         // transaction.addToBackStack(null)
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         transaction.commit()

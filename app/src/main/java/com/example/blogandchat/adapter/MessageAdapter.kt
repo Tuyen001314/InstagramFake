@@ -73,7 +73,10 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 viewHolder.timeOfMessage.text = message.currentTime
             }
         } else if (holder is ReceiverViewHolder) {
+            println("letho dđưs")
+
             AppKey.decrypt(message.message)?.let {
+                println(it+"letho")
                 holder.tvMessage.text = it
                 holder.timeOfMessage.text = message.currentTime
             }
