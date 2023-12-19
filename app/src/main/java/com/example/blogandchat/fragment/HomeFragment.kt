@@ -119,6 +119,10 @@ class HomeFragment : Fragment() {
             }, firestore = firestore, auth = auth)
         }!!
 
+        adapter.onCLickComment {postId, id ->
+            CommentDialogFragment.show(childFragmentManager, postId = postId, uId = id)
+        }
+
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
