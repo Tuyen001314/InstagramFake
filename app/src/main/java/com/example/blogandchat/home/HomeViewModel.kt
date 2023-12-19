@@ -31,9 +31,11 @@ class HomeViewModel : ViewModel() {
                 var userName: String? = ""
                 var imageUser: String? = ""
                 var idUserPost: String? = ""
+                var postID: String? = ""
                 fireStore.collection("users").document(it.user).get()
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            postID = task.result.id
                             userName = task.result.getString("name")
                             imageUser = task.result.getString("image")
                             idUserPost = task.result.getString("id")
@@ -43,7 +45,7 @@ class HomeViewModel : ViewModel() {
                 if (idUser != null) {
                     fireStore.collection(
                         "posts/" +
-                                it.postId + "/likes"
+                                postID + "/likes"
                     ).document(idUser).addSnapshotListener { snapshot, e ->
                         if (e == null) {
                             if (snapshot != null) {
@@ -63,6 +65,7 @@ class HomeViewModel : ViewModel() {
                     isLiked = isLiked
 
                 )
+                postDetail.postId = postID
                 detailList.add(postDetail)
             }
             _postDetails.postValue(detailList)

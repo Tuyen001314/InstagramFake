@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +28,10 @@ import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 
 
-class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
+class PostAdapter(
+    val onClickImage: PostDetailListener, val context: Context, var firestore: FirebaseFirestore,
+    var auth: FirebaseAuth,
+) :
     ListAdapter<PostDetailModel, PostAdapter.ViewHolder>(object :
         DiffUtil.ItemCallback<PostDetailModel>() {
         override fun areItemsTheSame(oldItem: PostDetailModel, newItem: PostDetailModel): Boolean {
@@ -38,19 +42,16 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
             oldItem: PostDetailModel,
             newItem: PostDetailModel,
         ): Boolean {
-            return oldItem.caption == newItem.caption && oldItem.isLiked == newItem.isLiked && oldItem.image == newItem.image
+            return oldItem.postId == newItem.postId && oldItem.time == newItem.time
         }
 
     }) {
-    private lateinit var firestore: FirebaseFirestore
-    private lateinit var auth: FirebaseAuth
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View =
             LayoutInflater.from(parent.context).inflate(R.layout.each_post, parent, false)
-        firestore = FirebaseFirestore.getInstance()
-        auth = FirebaseAuth.getInstance()
-        return ViewHolder(view, onClickImage)
+        return ViewHolder(view)
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -58,7 +59,7 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
         val post: PostDetailModel = getItem(position)
         Glide.with(context).load(post.image).into(holder.postPic)
 
-        holder.bindData(post.image)
+        holder.bindData(post.image, onClickImage)
 
         holder.setPostCaption(post.caption)
 
@@ -128,10 +129,13 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
         }
 
         holder.commentPost.setOnClickListener {
-            val intent = Intent(context, CommentActivity::class.java)
-            intent.putExtra("id", post.postId)
-            intent.putExtra("userId", FirebaseAuth.getInstance().uid)
-            context.startActivity(intent)
+            Log.e(">>>>>>>", post.postId.toString() )
+
+            onClickImage.comment(post.postId.toString(), FirebaseAuth.getInstance().uid.toString())
+//            val intent = Intent(context, CommentActivity::class.java)
+//            intent.putExtra("id", post.postId)
+//            intent.putExtra("userId", FirebaseAuth.getInstance().uid)
+//            context.startActivity(intent)
         }
 
 
@@ -149,7 +153,7 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
     }
 
 
-    class ViewHolder(itemView: View, private val onClickImage: PostDetailListener) :
+    class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
         val likeImage: ImageView = itemView.findViewById(R.id.img_view_like)
@@ -166,7 +170,7 @@ class PostAdapter(val onClickImage: PostDetailListener, val context: Context) :
 //            postLikes.text = "$count Likes"
 //        }
 
-        fun bindData(id: String) {
+        fun bindData(id: String, onClickImage: PostDetailListener) {
             postPic.setOnClickListener {
                 onClickImage.click(id)
                 //Log.d("image", id.toString() + "")

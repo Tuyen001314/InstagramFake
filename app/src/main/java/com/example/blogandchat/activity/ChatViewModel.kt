@@ -1,6 +1,8 @@
 package com.example.blogandchat.activity
 
 import android.graphics.Bitmap
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.blogandchat.model.Message
@@ -17,29 +19,29 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
+
 class ChatViewModel : ViewModel() {
-    val calendar = Calendar.getInstance()
-    val simpleDateFormat = SimpleDateFormat("hh:mm a")
+    private val calendar = Calendar.getInstance()
+    private val simpleDateFormat = SimpleDateFormat("hh:mm a")
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
-
-
     fun uploadImage(
         bitmap: Bitmap,
         senderRoom: String,
         mReceiverUid: String?,
         receiverRoom: String,
     ) {
-        CoroutineScope(IO).launch {
-            val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            val enterdMessage = stream.toByteArray()
+        viewModelScope.launch {
+            val enterdMessage = optimizeAndConvertImageToByteArray(bitmap)
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
             val message = firebaseAuth.uid?.let { it1 ->
                 Message(
-                    currentTime = currentTime, message = AppKey.encrypt(enterdMessage),
-                    senderId = it1, timeStamp = date.time, type = 1
+                    currentTime = currentTime,
+                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf()),
+                    senderId = it1,
+                    timeStamp = date.time,
+                    type = 1
                 )
             }
 
@@ -77,13 +79,12 @@ class ChatViewModel : ViewModel() {
         receiverRoom: String,
     ) {
         viewModelScope.launch {
-
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
             val message = firebaseAuth.uid?.let { it1 ->
                 Message(
                     currentTime = currentTime, message = AppKey.encrypt(enterdMessage),
-                    senderId = it1, timeStamp = date.time
+                    senderId = it1, timeStamp = date.time, type = 0
                 )
             }
 
@@ -111,5 +112,37 @@ class ChatViewModel : ViewModel() {
                 })
         }
 
+    }
+
+    fun optimizeAndConvertImageToByteArray(bitmap: Bitmap): ByteArray? {
+        // Kích thước tối đa mong muốn của ảnh
+        val maxWidth = 800
+        val maxHeight = 800
+
+        // Tính toán kích thước mới dựa trên tỉ lệ khung hình
+        var width = bitmap.width
+        var height = bitmap.height
+        val ratio = width.toFloat() / height
+        if (width > maxWidth || height > maxHeight) {
+            if (ratio > 1) {
+                width = maxWidth
+                height = (width / ratio).toInt()
+            } else {
+                height = maxHeight
+                width = (height * ratio).toInt()
+            }
+        }
+
+        // Thay đổi kích thước ảnh
+        val newBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
+
+        // Chuyển đổi ảnh thành byte array
+        val baos = ByteArrayOutputStream()
+        newBitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos)
+        val byteArray = baos.toByteArray()
+
+        // Giải phóng bộ nhớ của bitmap
+        newBitmap.recycle()
+        return byteArray
     }
 }

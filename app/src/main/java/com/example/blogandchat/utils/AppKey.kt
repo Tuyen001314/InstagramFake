@@ -1,27 +1,19 @@
 package com.example.blogandchat.utils
 
-import android.content.Context
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.annotation.RequiresApi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 import java.security.KeyFactory
-import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.KeyStore.PrivateKeyEntry
 import java.security.spec.ECGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
-import java.util.Arrays
 import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
-import javax.crypto.KeyGenerator
-import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object AppKey {
@@ -109,5 +101,16 @@ object AppKey {
             e.printStackTrace()
         }
         return null
+    }
+
+    fun decryptByteArray(data:String):ByteArray{
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, secretKey)
+            val encryptedBytes: ByteArray = Base64.decode(data, Base64.DEFAULT)
+            return cipher.doFinal(encryptedBytes)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return byteArrayOf()
     }
 }

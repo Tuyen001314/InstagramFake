@@ -9,6 +9,7 @@
     android:layout_height="wrap_content">
 
     <RelativeLayout
+        android:id="@+id/relative_parent"
         android:paddingStart="3dp"
         android:paddingEnd="3dp"
         android:layout_width="wrap_content"
@@ -43,12 +44,4 @@
             android:textSize="7sp" />
 
     </RelativeLayout>
-    <com.makeramen.roundedimageview.RoundedImageView
-        android:id="@+id/img_mess"
-        android:layout_width="225dp"
-        android:layout_height="270dp"
-        app:riv_corner_radius="8dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

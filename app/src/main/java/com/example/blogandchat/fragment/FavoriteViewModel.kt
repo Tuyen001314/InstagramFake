@@ -55,28 +55,50 @@ class FavoriteViewModel() : ViewModel() {
 
 
 
-            fireStore.collection("users").whereNotEqualTo("id", id)
-                .get().addOnSuccessListener { documents ->
-                    job2 = this.async {
-                        val listSuggestions = mutableListOf<User>()
-                        for (document in documents) {
-                            val idUserReceive = document.id
-                           this.launch {
-                                fireStore.collection("users/$id/following")
-                                    .document(idUserReceive)
-                                    .get().addOnSuccessListener { doc ->
-                                        if (!doc.exists()) {
-                                            listSuggestions.add(document.toObject(User::class.java))
-                                        }
-                                    }.await()
-                            }
-                        }
-                        listSuggestions
-                    }
-                }.await()
 
+
+            val data = fireStore.collection("users").whereNotEqualTo("id", id).get().await()
+            job2 =  this.async {
+             val listSuggestions = mutableListOf<User>()
+               for (document in data) {
+                   val idUserReceive = document.id
+                   this.launch {
+                       fireStore.collection("users/$id/following")
+                           .document(idUserReceive)
+                           .get().addOnSuccessListener { doc ->
+                               if (!doc.exists()) {
+                                   listSuggestions.add(document.toObject(User::class.java))
+                               }
+                           }.await()
+                   }
+               }
+             listSuggestions
+           }
             _listFavorite.postValue(job1.await())
             _listSuggest.postValue(job2.await())
+
+
+//            fireStore.collection("users").whereNotEqualTo("id", id)
+//                .get().addOnSuccessListener { documents ->
+//                    job2 = this.async {
+//                        val listSuggestions = mutableListOf<User>()
+//                        for (document in documents) {
+//                            val idUserReceive = document.id
+//                           this.launch {
+//                                fireStore.collection("users/$id/following")
+//                                    .document(idUserReceive)
+//                                    .get().addOnSuccessListener { doc ->
+//                                        if (!doc.exists()) {
+//                                            listSuggestions.add(document.toObject(User::class.java))
+//                                        }
+//                                    }.await()
+//                            }
+//                        }
+//                        listSuggestions
+//                    }
+//                }.await()
+
+          //  _listSuggest.postValue(job2.await())
         }
 
     }

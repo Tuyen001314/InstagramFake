@@ -27,6 +27,7 @@ import com.example.blogandchat.R
 import com.example.blogandchat.adapter.MessageAdapter
 import com.example.blogandchat.databinding.ActivitySpecificChatBinding
 import com.example.blogandchat.model.Message
+import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.io.ByteArrayOutputStream
@@ -42,13 +43,36 @@ class SpecificChat : AppCompatActivity() {
     private lateinit var messagesAdapter: MessageAdapter
     private lateinit var binding: ActivitySpecificChatBinding
     lateinit var getContent: ActivityResultLauncher<String>
+    private lateinit var mGetContent: ActivityResultLauncher<String>
     val REQUEST_IMAGE_CAPTURE = 1
+    val REQUEST_IMAGE_PICKER = 2
+
     private val viewModel: ChatViewModel by viewModels()
     var mSenderUid: String = ""
     var mReceiverUid: String = ""
     var mReceiverName: String = ""
     var senderRoom = ""
     var receiverRoom = ""
+    lateinit var databaseReference: DatabaseReference
+    val postListener = object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            messageList.clear()
+            for (snapshot1 in snapshot.children) {
+                val message: Message? = snapshot1.getValue(Message::class.java)
+                if (message != null &&  !messageList.contains(message)) {
+                    messageList.add(message)
+                    Log.e(">>>>>>>>>>>>", "Value is: $message");
+                }
+            }
+            messagesAdapter.notifyDataSetChanged()
+            binding.recycleChat.scrollToPosition(messageList.size - 1)
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            Log.e(">>>>>>>>>>>>>", databaseError.message)
+
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,11 +84,14 @@ class SpecificChat : AppCompatActivity() {
             R.layout.activity_specific_chat
         )
 
+        requestPermission()
+
+
         mSenderUid = firebaseAuth.uid.toString()
         mReceiverUid = intent.getStringExtra("receiveruid").toString()
         mReceiverName = intent.getStringExtra("name").toString()
         val publicKey = intent.getStringExtra("publicKey")
-        //  AppKey.calculateKey(publicKey.toString())
+        AppKey.calculateKey(publicKey.toString())
 
 
         val linearLayoutManager = LinearLayoutManager(this)
@@ -72,43 +99,14 @@ class SpecificChat : AppCompatActivity() {
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         binding.recycleChat.layoutManager = linearLayoutManager
 
-         senderRoom = mSenderUid + mReceiverUid
-         receiverRoom = mReceiverUid + mSenderUid
+        senderRoom = mSenderUid + mReceiverUid
+        receiverRoom = mReceiverUid + mSenderUid
 
-        val databaseReference: DatabaseReference =
-            firebaseDatabase.reference.child("chats").child(senderRoom)
-                .child("messages")
+        databaseReference =
+            firebaseDatabase.reference.child("chats").child(senderRoom).child("messages")
 
-        val postListener = object : ValueEventListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onDataChange(snapshot: DataSnapshot) {
-                // Get Post object and use the values to update the UI
-                //val post = dataSnapshot.value
-//                if (post != null) {
-//                    messageList.add(post)
-//                }
-                messageList.clear()
-                for (snapshot1 in snapshot.children) {
-                    val message: Message? = snapshot1.getValue(Message::class.java)
-                    if (message != null) {
-                        messageList.add(message)
-                        Log.e(">>>>>>>>>>>>", "Value is: $message");
-                    }
-                }
-
-                messagesAdapter.notifyDataSetChanged()
-                // ...
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Getting Post failed, log a message
-                //Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        }
 
         messagesAdapter = MessageAdapter(this@SpecificChat, messageList)
-
-        databaseReference.addValueEventListener(postListener)
 
         binding.recycleChat.adapter = messagesAdapter
 
@@ -119,7 +117,7 @@ class SpecificChat : AppCompatActivity() {
         if (uri!!.isEmpty()) {
             Toast.makeText(applicationContext, "null is received", Toast.LENGTH_SHORT).show()
         } else {
-            Glide.with(this).load(uri).into(binding.imageUserChat)
+            Glide.with(this).load(uri).into(binding.imgAvt)
         }
 
         binding.edtChat.onFocusChangeListener = OnFocusChangeListener { p0, p1 ->
@@ -128,7 +126,11 @@ class SpecificChat : AppCompatActivity() {
         }
 
         binding.imgNew.setOnClickListener {
-            requestPermission()
+            dispatchTakePictureIntent()
+        }
+
+        binding.imgPick.setOnClickListener {
+            openGalleryForImage()
         }
 
 
@@ -152,13 +154,13 @@ class SpecificChat : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onStart() {
         super.onStart()
-        messagesAdapter.notifyDataSetChanged()
+        databaseReference.addValueEventListener(postListener)
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onStop() {
+        databaseReference.removeEventListener(postListener)
         super.onStop()
-        messagesAdapter.notifyDataSetChanged()
     }
 
     fun hideSoftKeyboard(activity: Activity?) {
@@ -174,7 +176,7 @@ class SpecificChat : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (currentFocus != null) {
+        if (currentFocus != null && !ev.isButtonPressed(binding.imageBtnChat.id)) {
             hideSoftKeyboard(this)
         }
         return super.dispatchTouchEvent(ev)
@@ -185,39 +187,69 @@ class SpecificChat : AppCompatActivity() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val extras = data?.extras
             val bitmap = extras?.get("data") as Bitmap
-            val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            val enterdMessage = stream.toByteArray()
-            println(Arrays.toString(enterdMessage))
-//            viewModel.uploadImage(
-//                bitmap, senderRoom = senderRoom,
-//                mReceiverUid = mReceiverUid,
-//                receiverRoom = receiverRoom
-//            )
+            viewModel.uploadImage(
+                bitmap, senderRoom = senderRoom,
+                mReceiverUid = mReceiverUid,
+                receiverRoom = receiverRoom
+            )
         }
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_IMAGE_PICKER) {
+
+            data?.data?.let {
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, it);
+                viewModel.uploadImage(
+                    bitmap, senderRoom = senderRoom,
+                    mReceiverUid = mReceiverUid,
+                    receiverRoom = receiverRoom
+                )
+            }
+
+        }
+
     }
 
     fun requestPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_DENIED
-        ) {
+        val permissions: Array<String> = try {
+            val info = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+            val requestedPermissions = info.requestedPermissions
+            if (requestedPermissions != null && requestedPermissions.isNotEmpty()) {
+                requestedPermissions
+            } else {
+                arrayOf()
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            arrayOf()
+        }
 
-            ActivityCompat.requestPermissions(
-                this,
-                listOf(Manifest.permission.CAMERA).toTypedArray(),
-                99
-            );
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission,
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
         }
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_DENIED
-        ) {
-            dispatchTakePictureIntent()
-        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+//            == PackageManager.PERMISSION_DENIED
+//        ) {
+//
+//            ActivityCompat.requestPermissions(
+//                this,
+//                listOf(Manifest.permission.CAMERA).toTypedArray(),
+//                99
+//            );
+//        }
     }
 
     private fun dispatchTakePictureIntent() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            return
+        }
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(packageManager) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
@@ -225,6 +257,12 @@ class SpecificChat : AppCompatActivity() {
             // Thông báo cho người dùng rằng không có ứng dụng camera nào được cài đặt
             Toast.makeText(this, "Không tìm thấy ứng dụng camera", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun openGalleryForImage() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, REQUEST_IMAGE_PICKER)
     }
 
 
