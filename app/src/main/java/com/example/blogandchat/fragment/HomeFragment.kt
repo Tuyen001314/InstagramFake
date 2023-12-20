@@ -55,6 +55,7 @@ class HomeFragment : Fragment() {
     private lateinit var listenerRegistration: ListenerRegistration
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+    var urlShare = ""
 
 
     //private val viewModel by navGraphViewModels<HomeViewModel>(R.id.mobile_navigation)
@@ -133,6 +134,7 @@ class HomeFragment : Fragment() {
                 }
 
                 override fun share(url: String) {
+                    urlShare = url
                     viewModel.getFriends()
                 }
 
@@ -150,7 +152,9 @@ class HomeFragment : Fragment() {
         }
         viewModel.listFriend.observe(viewLifecycleOwner) {
             if (!it.isNullOrEmpty()) {
-                val dialog = ShareDialogFragment.newInstance(it as ArrayList<User>)
+                val dialog = ShareDialogFragment.newInstance(it as ArrayList<User>, onSend = {
+                    viewModel.sendToFriends(it,urlShare)
+                })
                 dialog.show(childFragmentManager, "SHARE_DIALOG_FRAGMENT")
             }
 

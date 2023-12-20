@@ -150,7 +150,7 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     inner class ImageReceiverViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val img: ImageView = itemView.findViewById(R.id.img_mess)
+        val img: ImageView = itemView.findViewById(R.id.img_mess_receive)
     }
 
     inner class EmptyView(itemView: View) : RecyclerView.ViewHolder(itemView)

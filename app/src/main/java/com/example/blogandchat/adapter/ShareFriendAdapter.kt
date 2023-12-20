@@ -6,14 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.example.blogandchat.R
 import com.example.blogandchat.model.User
 import com.example.blogandchat.model.UserShare
 
 
-class ShareFriendAdapter(val context: Context, private val list: ArrayList<User>) : BaseAdapter() {
+class ShareFriendAdapter(val context: Context, private val list: List<UserShare>) : BaseAdapter() {
     override fun getCount(): Int {
         return list.size
     }
@@ -36,6 +39,7 @@ class ShareFriendAdapter(val context: Context, private val list: ArrayList<User>
             viewHolder = ViewHolder()
             viewHolder.name = view.findViewById(R.id.tv_name)
             viewHolder.button = view.findViewById(R.id.bt_pick)
+            viewHolder.image = view.findViewById(R.id.cardviewOfUserFollow)
             view.tag = viewHolder
         } else {
             viewHolder = view.tag as ViewHolder
@@ -45,13 +49,17 @@ class ShareFriendAdapter(val context: Context, private val list: ArrayList<User>
 
         viewHolder.name.text = (currentItem as UserShare).name
         viewHolder.button.isSelected = (currentItem as UserShare).isPicked
+        Glide.with(context).load(currentItem.image).into(viewHolder.image)
 
         (currentItem as UserShare).isPicked = viewHolder.button.isSelected
+
+
 
         return view!!
     }
     private class ViewHolder{
-        lateinit var button: RadioButton
+        lateinit var button: CheckBox
         lateinit var name: TextView
+        lateinit var image : ImageView
     }
 }

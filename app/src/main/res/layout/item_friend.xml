@@ -32,7 +32,7 @@
 
     </de.hdodenhof.circleimageview.CircleImageView>
 
-    <RadioButton
+    <CheckBox
         android:id="@+id/bt_pick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
