@@ -25,7 +25,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.net.URL
-import java.security.PublicKey
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -135,6 +134,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun sendToFriends(ids: List<String>, url: String) {
+        println(ids.toString())
         CoroutineScope(IO).launch {
             val job = CoroutineScope(IO).async {
                 urlToBitmap(url)
@@ -203,19 +203,17 @@ class HomeViewModel : ViewModel() {
 
     suspend fun urlToBitmap(url: String): Bitmap? {
         var bitmap: Bitmap? = null
-        CoroutineScope(IO).launch {
-            var inputStream: InputStream? = null
-            try {
-                val imageUrl = URL(url)
-                inputStream = withContext(IO) {
-                    imageUrl.openStream()
-                }
-                bitmap = BitmapFactory.decodeStream(inputStream)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                inputStream?.close()
+        var inputStream: InputStream? = null
+        try {
+            val imageUrl = URL(url)
+            inputStream = withContext(IO) {
+                imageUrl.openStream()
             }
+            bitmap = BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            inputStream?.close()
         }
         return bitmap
     }

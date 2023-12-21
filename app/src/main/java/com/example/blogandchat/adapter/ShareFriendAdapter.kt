@@ -16,7 +16,7 @@ import com.example.blogandchat.model.User
 import com.example.blogandchat.model.UserShare
 
 
-class ShareFriendAdapter(val context: Context, private val list: List<UserShare>) : BaseAdapter() {
+class ShareFriendAdapter(val context: Context, private val list: MutableList<UserShare>, val onShareFriend: ShareFriendCallBack) : BaseAdapter() {
     override fun getCount(): Int {
         return list.size
     }
@@ -26,7 +26,7 @@ class ShareFriendAdapter(val context: Context, private val list: List<UserShare>
     }
 
     override fun getItemId(p0: Int): Long {
-            return list[p0].id.toLong()
+            return  p0.toLong()
     }
 
 
@@ -48,10 +48,13 @@ class ShareFriendAdapter(val context: Context, private val list: List<UserShare>
         val currentItem = getItem(position)
 
         viewHolder.name.text = (currentItem as UserShare).name
-        viewHolder.button.isSelected = (currentItem as UserShare).isPicked
+        viewHolder.button.isSelected = (currentItem).isPicked
         Glide.with(context).load(currentItem.image).into(viewHolder.image)
 
-        (currentItem as UserShare).isPicked = viewHolder.button.isSelected
+        viewHolder.button.setOnClickListener {
+            onShareFriend.onClickCheckBox(viewHolder.button.isChecked, position)
+        }
+
 
 
 
@@ -62,4 +65,7 @@ class ShareFriendAdapter(val context: Context, private val list: List<UserShare>
         lateinit var name: TextView
         lateinit var image : ImageView
     }
+}
+interface ShareFriendCallBack{
+    fun onClickCheckBox(isCheck: Boolean, position: Int)
 }

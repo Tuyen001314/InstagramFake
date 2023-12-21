@@ -13,10 +13,12 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.ShareFriendAdapter
+import com.example.blogandchat.adapter.ShareFriendCallBack
 import com.example.blogandchat.model.User
 import com.example.blogandchat.model.UserShare
 
 class ShareDialogFragment(val onSend: (List<String>) -> Unit) : DialogFragment() {
+    lateinit var adapter: ShareFriendAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,7 +46,14 @@ class ShareDialogFragment(val onSend: (List<String>) -> Unit) : DialogFragment()
                     email = user.email
                 )
             }
-        val adapter = ShareFriendAdapter(view.context, friendList)
+        adapter = ShareFriendAdapter(view.context, friendList.toMutableList(), object :ShareFriendCallBack{
+            override fun onClickCheckBox(isCheck: Boolean, position: Int) {
+                friendList[position].isPicked = isCheck
+                adapter.notifyDataSetChanged()
+            }
+
+
+        })
         listView.adapter = adapter
         tvCancel.setOnClickListener { this.dismiss() }
         tvSend.setOnClickListener {
@@ -71,7 +80,7 @@ class ShareDialogFragment(val onSend: (List<String>) -> Unit) : DialogFragment()
             onSend: (List<String>) -> Unit
         ) = ShareDialogFragment(onSend).apply {
             arguments = bundleOf(
-                FRIENDS to list
+                FRIENDS to list,
             )
         }
     }
