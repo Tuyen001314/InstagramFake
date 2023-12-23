@@ -12,7 +12,7 @@ import com.example.blogandchat.adapter.VideoAdapter2
 import com.example.blogandchat.databinding.FragmentSearchBinding
 import com.example.blogandchat.model.ExoPlayerItem
 import com.example.blogandchat.model.Video
-import com.google.android.exoplayer2.ExoPlayer
+import java.lang.ref.WeakReference
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,12 +28,27 @@ class SearchFragment : Fragment() {
 
     private lateinit var adapter: VideoAdapter2
 
-    private lateinit var player: ExoPlayer
-
     private val videos = ArrayList<Video>()
     private val exoPlayerItems = ArrayList<ExoPlayerItem>()
 
     private lateinit var binding: FragmentSearchBinding
+
+    val viewPagerListener = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer.isPlaying }
+            if (previousIndex != -1) {
+                val player = exoPlayerItems[previousIndex].exoPlayer
+                player.pause()
+                player.playWhenReady = false
+            }
+            val newIndex = exoPlayerItems.indexOfFirst { it.position == position }
+            if (newIndex != -1) {
+                val player = exoPlayerItems[newIndex].exoPlayer
+                player.playWhenReady = true
+                player.play()
+            }
+        }
+    }
 
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -53,7 +68,7 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_search,container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         return binding.root
     }
 
@@ -97,30 +112,16 @@ class SearchFragment : Fragment() {
             )
         )
 
-        adapter = VideoAdapter2(requireContext(), videos, object : VideoAdapter2.OnVideoPreparedListener {
-            override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
-                exoPlayerItems.add(exoPlayerItem)
-            }
-        })
+        adapter =
+            VideoAdapter2(requireContext(), videos, object : VideoAdapter2.OnVideoPreparedListener {
+                override fun onVideoPrepared(exoPlayerItem:ExoPlayerItem) {
+                        exoPlayerItems.add(exoPlayerItem)
+                }
+            })
 
         binding.viewPager.adapter = adapter
 
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer.isPlaying }
-                if (previousIndex != -1) {
-                    val player = exoPlayerItems[previousIndex].exoPlayer
-                    player.pause()
-                    player.playWhenReady = false
-                }
-                val newIndex = exoPlayerItems.indexOfFirst { it.position == position }
-                if (newIndex != -1) {
-                    val player = exoPlayerItems[newIndex].exoPlayer
-                    player.playWhenReady = true
-                    player.play()
-                }
-            }
-        })
+        binding.viewPager.registerOnPageChangeCallback(viewPagerListener)
     }
 
     /*override fun onStart() {
@@ -134,19 +135,17 @@ class SearchFragment : Fragment() {
     }*/
 
     override fun onPause() {
-        super.onPause()
-
         val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager.currentItem }
         if (index != -1) {
             val player = exoPlayerItems[index].exoPlayer
             player.pause()
             player.playWhenReady = false
         }
+        super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-
         val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager.currentItem }
         if (index != -1) {
             val player = exoPlayerItems[index].exoPlayer
@@ -156,7 +155,7 @@ class SearchFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        binding.viewPager.unregisterOnPageChangeCallback(viewPagerListener)
         if (exoPlayerItems.isNotEmpty()) {
             for (item in exoPlayerItems) {
                 val player = item.exoPlayer
@@ -164,6 +163,8 @@ class SearchFragment : Fragment() {
                 player.clearMediaItems()
             }
         }
+        exoPlayerItems.clear()
+        super.onDestroy()
     }
 
     companion object {

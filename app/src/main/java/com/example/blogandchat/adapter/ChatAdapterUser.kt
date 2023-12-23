@@ -7,28 +7,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
 import com.example.blogandchat.activity.SpecificChat
 import com.example.blogandchat.model.Message
 import com.example.blogandchat.model.User
+import com.example.blogandchat.model.UserMessageModel
 import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.ServerTimestamp
 import de.hdodenhof.circleimageview.CircleImageView
 
-class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>() {
-    private lateinit var listUser: MutableList<User>
-    private lateinit var context: Context
-    private var message: Message? = null
-    private lateinit var time: ServerTimestamp
-
-    constructor(context: Context, listUser: MutableList<User>) : this() {
-        this.listUser = listUser
-        this.context = context
-    }
+class ChatAdapterUser(
+    val  listUser: MutableList<UserMessageModel>
+) : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val view: View = LayoutInflater.from(parent.context)
@@ -37,78 +32,14 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-
-        val firebaseModel: User = listUser[position]
-        AppKey.calculateKey(firebaseModel.publicKey.toString())
-
-        Glide.with(context).load(firebaseModel.image).into(holder.avatar)
-        holder.nameOfUser.text = firebaseModel.name
-        if (firebaseModel.status == "online") {
-            holder.statusOfUser.visibility = View.VISIBLE
-        } else {
-            holder.statusOfUser.visibility = View.VISIBLE
-        }
-
-        holder.itemView.setOnClickListener(View.OnClickListener { v ->
-            val intent = Intent(v.context, SpecificChat::class.java)
-            intent.putExtra("name", firebaseModel.name)
-            intent.putExtra("receiveruid", firebaseModel.id)
-            intent.putExtra("imageuri", firebaseModel.image)
-            intent.putExtra("publicKey", firebaseModel.publicKey)
-            v.context.startActivity(intent)
-        })
-
-
-        val senderRoom = FirebaseAuth.getInstance().uid + firebaseModel.id
-
-        val databaseReference: DatabaseReference =
-            FirebaseDatabase.getInstance().reference.child("chats").child(senderRoom)
-                .child("messages")
-
-        val postListener = object : ValueEventListener {
-            @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                //messageList.clear()
-                for (snapshot1 in snapshot.children) {
-                    message = snapshot1.getValue(Message::class.java)!!
-                    //messageList.add(message)
-                    //Log.d("hhhhh", "Value is: $message");
-                }
-                if (message?.type != 1) {
-                    if (message?.senderId == FirebaseAuth.getInstance().uid) {
-                        AppKey.decrypt(message?.message)?.let {
-                            holder.lastMessage.text = "Bạn: " + it
-                        }
-                    } else {
-                        AppKey.decrypt(message?.message)?.let { holder.lastMessage.text = it }
-                    }
-                } else {
-                    if (message?.senderId == FirebaseAuth.getInstance().uid) {
-                        holder.lastMessage.text = "Bạn: Hình ảnh"
-                    } else {
-                        holder.lastMessage.text = "Hình ảnh"
-                    }
-                }
-
-
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Getting Post failed, log a message
-                //Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        }
-
-        databaseReference.addValueEventListener(postListener)
-
+        holder.bindView(listUser[position].user, listUser[position].message)
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun filterList(filterlist: MutableList<User>) {
         // below line is to add our filtered
         // list in our course array list.
-        listUser = filterlist
+        //listUser = filterlist
         // below line is to notify our adapter
         // as change in recycler view data.
         notifyDataSetChanged()
@@ -119,11 +50,45 @@ class ChatAdapterUser() : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>(
     }
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val parentView: ConstraintLayout = itemView.findViewById(R.id.user_parent_view)
         val nameOfUser: TextView = itemView.findViewById(R.id.nameOfUser1)
         val statusOfUser: CircleImageView = itemView.findViewById(R.id.viewStatus)
         val avatar: CircleImageView = itemView.findViewById(R.id.cardviewOfUser1)
         val lastMessage: TextView = itemView.findViewById(R.id.statusOfUser)
 
+
+        fun bindView(user: User, message: Message) {
+            AppKey.calculateKey(user.publicKey.toString())
+            Glide.with(parentView.context).load(user.image).into(avatar)
+            if (message.type != 1) {
+                if (message.senderId == FirebaseAuth.getInstance().uid) {
+                        lastMessage.text = "Bạn: " + message.message
+                } else {
+                   lastMessage.text = message.message
+                }
+            } else {
+                if (message.senderId == FirebaseAuth.getInstance().uid) {
+                    lastMessage.text = "Bạn: Hình ảnh"
+                } else {
+                    lastMessage.text = "Hình ảnh"
+                }
+            }
+            nameOfUser.text = user.name
+            if (user.status == "online") {
+                statusOfUser.visibility = View.VISIBLE
+            } else {
+                statusOfUser.visibility = View.INVISIBLE
+            }
+
+            parentView.setOnClickListener(View.OnClickListener { v ->
+                val intent = Intent(v.context, SpecificChat::class.java)
+                intent.putExtra("name", user.name)
+                intent.putExtra("receiveruid", user.id)
+                intent.putExtra("imageuri", user.image)
+                intent.putExtra("publicKey", user.publicKey)
+                v.context.startActivity(intent)
+            })
+        }
     }
 
 }

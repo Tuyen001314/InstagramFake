@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,8 +17,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.ChatAdapter
 import com.example.blogandchat.adapter.ChatAdapterUser
+import com.example.blogandchat.databinding.FragmentChatBinding
+import com.example.blogandchat.model.Message
 import com.example.blogandchat.model.User
+import com.example.blogandchat.model.UserMessageModel
+import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
@@ -32,57 +41,51 @@ private const val ARG_PARAM2 = "param2"
  */
 class ChatFragment : Fragment() {
     private val viewModel: ChatListViewModel by viewModels()
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var recyclerView1: RecyclerView
     private var list: MutableList<User> = ArrayList()
-    private var list1: MutableList<User> = ArrayList()
-
-    private lateinit var adapter: ChatAdapter
-    private lateinit var adapterUser: ChatAdapterUser
+    private var list1 = mutableListOf<UserMessageModel>()
+    private lateinit var binding: FragmentChatBinding
 
     // private lateinit var listenerRegistration: ListenerRegistration
-    private lateinit var linearLayoutManager: LinearLayoutManager
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, container, false)
+        return binding.root
     }
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         viewModel.fetchListUser()
-        recyclerView = view.findViewById(R.id.recyclerViewChat)
-        recyclerView1 = view.findViewById(R.id.recyclerViewChat1)
         val searchChat: SearchView = view.findViewById(R.id.searchChat)
 
 
-        adapter = ChatAdapter(requireContext(), list)
-        recyclerView.setHasFixedSize(true)
-        linearLayoutManager = LinearLayoutManager(context)
-        linearLayoutManager.orientation = RecyclerView.HORIZONTAL
-        recyclerView.layoutManager = linearLayoutManager
-        recyclerView.adapter = adapter
+        val adapter = ChatAdapter(requireContext(), list)
+        binding.recyclerViewChat.setHasFixedSize(true)
+        val linearLayoutManagerHorizontal = LinearLayoutManager(requireContext())
+        linearLayoutManagerHorizontal.orientation = RecyclerView.HORIZONTAL
+        binding.recyclerViewChat.layoutManager = linearLayoutManagerHorizontal
+        binding.recyclerViewChat.adapter = adapter
 
-        adapterUser = ChatAdapterUser(requireContext(), list1)
-        recyclerView1.setHasFixedSize(true)
-        linearLayoutManager = LinearLayoutManager(context)
+       val  adapterUser = ChatAdapterUser(list1)
+        binding.recyclerViewChat1.setHasFixedSize(true)
+        val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = RecyclerView.VERTICAL
-        recyclerView1.layoutManager = linearLayoutManager
-        recyclerView1.adapter = adapterUser
+        binding.recyclerViewChat1.layoutManager = linearLayoutManager
+        binding.recyclerViewChat1.adapter = adapterUser
 
-        viewModel.listUser.observe(viewLifecycleOwner) {
+        viewModel.pairLiveData.observe(viewLifecycleOwner) {
             list.clear()
-            list.addAll(it)
             list1.clear()
+            it.forEach { userMessage ->
+                list.add(userMessage.user)
+            }
             list1.addAll(it)
-            adapterUser.notifyDataSetChanged()
             adapter.notifyDataSetChanged()
+            adapterUser.notifyDataSetChanged()
         }
 
 
@@ -118,17 +121,21 @@ class ChatFragment : Fragment() {
         if (filteredlist.isEmpty()) {
             // if no item is added in filtered list we are
             // displaying a toast message as no data found.
-            Toast.makeText(context, "No Data Found..", Toast.LENGTH_SHORT).show()
-            adapterUser.filterList(filteredlist)
+            Toast.makeText(requireContext(), "No Data Found..", Toast.LENGTH_SHORT).show()
+            //adapterUser.filterList(filteredlist)
         } else {
             // at last we are passing that filtered
             // list to our adapter class.
-            adapterUser.filterList(filteredlist)
+          //  adapterUser.filterList(filteredlist)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.pairLiveData.removeObservers(viewLifecycleOwner)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        list.clear()
     }
 }

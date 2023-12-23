@@ -11,6 +11,7 @@ import com.example.blogandchat.utils.optimizeAndConvertImageToByteArray
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -46,16 +47,17 @@ class ChatViewModel : ViewModel() {
                 )
             }
 
-            firebaseAuth.uid?.let { it1 ->
-                FirebaseFirestore.getInstance().collection("users/${mReceiverUid}/message")
-                    .document(
-                        it1
-                    ).update(
-                        mapOf(
-                            "timeseen" to "1"
-                        )
-                    )
-            }
+//            firebaseAuth.uid?.let { it1 ->
+//                FirebaseFirestore.getInstance().collection("users/${mReceiverUid}/message")
+//                    .document(
+//                        it1
+//                    ).update(
+//                        mapOf(
+//                            "timeseen" to "1",
+//                            "last_message" to message?.message
+//                        )
+//                    )
+//            }
 
             firebaseDatabase.reference.child("chats")
                 .child(senderRoom)
@@ -89,16 +91,18 @@ class ChatViewModel : ViewModel() {
                 )
             }
 
-            firebaseAuth.uid?.let { it1 ->
-                FirebaseFirestore.getInstance().collection("users/${mReceiverUid}/message")
-                    .document(
-                        it1
-                    ).update(
-                        mapOf(
-                            "timeseen" to "1"
-                        )
-                    )
-            }
+
+//            firebaseAuth.uid?.let { it1 ->
+//                FirebaseFirestore.getInstance().collection("users/${mReceiverUid}/message")
+//                    .document(
+//                        it1
+//                    ).update(
+//                        mapOf(
+//                            "timeseen" to "1",
+//                            "last_message" to message?.message
+//                        )
+//                    )
+//            }
 
             firebaseDatabase.reference.child("chats")
                 .child(senderRoom)
@@ -113,5 +117,23 @@ class ChatViewModel : ViewModel() {
                 })
         }
 
+    }
+
+    fun updateLastMessage(mReceiverUid: String?, lastMessage: Message) {
+        mReceiverUid?.let {
+            FirebaseFirestore.getInstance().collection("users/${firebaseAuth.uid}/message")
+                .get()
+                .addOnCompleteListener { _ ->
+                    val timeRequest: MutableMap<String, Any> = HashMap()
+                    timeRequest["id"] = mReceiverUid.toString()
+                    timeRequest["timestamp"] = FieldValue.serverTimestamp()
+                    timeRequest["timeseen"] = "0"
+                    timeRequest["last_message"] = lastMessage?.toMap() ?: ""
+                    FirebaseFirestore.getInstance()
+                        .collection("users/${firebaseAuth.uid}/message")
+                        .document(mReceiverUid.toString())
+                        .set(timeRequest)
+                }
+        }
     }
 }

@@ -59,12 +59,16 @@ class SpecificChat : AppCompatActivity() {
             messageList.clear()
             for (snapshot1 in snapshot.children) {
                 val message: Message? = snapshot1.getValue(Message::class.java)
-                if (message != null &&  !messageList.contains(message)) {
+                if (message != null && !messageList.contains(message)) {
                     messageList.add(message)
                     Log.e(">>>>>>>>>>>>", "Value is: $message");
                 }
             }
             messagesAdapter.notifyDataSetChanged()
+            viewModel.updateLastMessage(
+                mReceiverUid,
+                snapshot.children.last().getValue(Message::class.java) ?: Message()
+            )
             binding.recycleChat.scrollToPosition(messageList.size - 1)
         }
 

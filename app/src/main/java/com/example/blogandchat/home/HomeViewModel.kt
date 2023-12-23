@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
@@ -174,16 +175,30 @@ class HomeViewModel : ViewModel() {
                 )
             }
 
-            firebaseAuth.uid?.let { it1 ->
-                FirebaseFirestore.getInstance().collection("users/${mReceiverUid}/message")
-                    .document(
-                        it1
-                    ).update(
-                        mapOf(
-                            "timeseen" to "1"
-                        )
-                    )
-            }
+            fireStore.collection("users/${firebaseAuth.uid}/message")
+                .get()
+                .addOnCompleteListener { _ ->
+                    val timeRequest: MutableMap<String, Any> = HashMap()
+                    timeRequest["id"] = mReceiverUid.toString()
+                    timeRequest["timestamp"] = FieldValue.serverTimestamp()
+                    timeRequest["timeseen"] = "0"
+                    timeRequest["last_message"] = message?.toMap() ?: ""
+                    fireStore
+                        .collection("users/${firebaseAuth.uid}/message")
+                        .document(mReceiverUid.toString())
+                        .set(timeRequest)
+                }
+
+//            firebaseAuth.uid?.let { it1 ->
+//                FirebaseFirestore.getInstance().collection("users/${mReceiverUid}/message")
+//                    .document(
+//                        it1
+//                    ).update(
+//                        mapOf(
+//                            "timeseen" to "1"
+//                        )
+//                    )
+//            }
 
             firebaseDatabase.reference.child("chats")
                 .child(senderRoom)

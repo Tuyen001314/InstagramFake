@@ -41,4 +41,14 @@ data class Message(
         }
     }
 
+    fun toMap(): Map<String, Any> {
+        val messageMap = HashMap<String, Any>()
+        messageMap["currentTime"] = currentTime
+        messageMap["timeStamp"] = timeStamp ?: 0L
+        messageMap["senderId"] = senderId
+        messageMap["message"] = message
+        messageMap["type"] = type ?: 0
+        return messageMap
+    }
+
 }

@@ -23,26 +23,20 @@ import java.util.logging.Logger
 class VideoAdapter2(
     var context: Context,
     var videos: ArrayList<Video>,
-    var videoPreparedListener: OnVideoPreparedListener
+    var videoPreparedListener: OnVideoPreparedListener,
 ) : RecyclerView.Adapter<VideoAdapter2.VideoViewHolder>() {
 
     class VideoViewHolder(
         val binding: EachVideoBinding,
-        var context: Context,
-        var videoPreparedListener: OnVideoPreparedListener
     ) : RecyclerView.ViewHolder(binding.root) {
+        fun setVideoPath(url: String, videoPreparedListener: OnVideoPreparedListener) {
 
-        private lateinit var exoPlayer: ExoPlayer
-        private lateinit var mediaSource: MediaSource
-
-        fun setVideoPath(url: String) {
-
-            exoPlayer = ExoPlayer.Builder(context).build()
+            val exoPlayer = ExoPlayer.Builder(binding.root.context).build()
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
                     Log.d("buituyen", error.message.toString())
-                    Toast.makeText(context, "Can't play this video", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(binding.root.context, "Can't play this video", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -59,10 +53,11 @@ class VideoAdapter2(
             exoPlayer.seekTo(0)
             exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
 
-            val dataSourceFactory = DefaultDataSource.Factory(context)
+            val dataSourceFactory = DefaultDataSource.Factory(binding.root.context)
 
-            mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
-                MediaItem.fromUri(Uri.parse(url)))
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                MediaItem.fromUri(Uri.parse(url))
+            )
 
             exoPlayer.setMediaSource(mediaSource)
             exoPlayer.prepare()
@@ -78,14 +73,12 @@ class VideoAdapter2(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
         val view = EachVideoBinding.inflate(LayoutInflater.from(context), parent, false)
-        return VideoViewHolder(view, context, videoPreparedListener)
+        return VideoViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val model = videos[position]
-
-        //holder.binding.tvTitle.text = model.title
-        holder.setVideoPath(model.videoUrl)
+        holder.setVideoPath(model.videoUrl, videoPreparedListener)
     }
 
     override fun getItemCount(): Int {

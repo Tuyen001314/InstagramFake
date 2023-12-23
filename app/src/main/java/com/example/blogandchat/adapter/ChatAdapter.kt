@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.blogandchat.R
@@ -29,24 +30,7 @@ class ChatAdapter() : RecyclerView.Adapter<ChatAdapter.NoteViewHolder?>() {
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-
-        val firebaseModel: User = listUser[position]
-
-        Glide.with(context).load(firebaseModel.image).into(holder.avatar)
-        holder.nameOfUser.text = firebaseModel.name
-        if (firebaseModel.status == "online") {
-            holder.statusOfUser.visibility = View.VISIBLE
-        } else {
-            holder.statusOfUser.visibility = View.INVISIBLE
-        }
-
-        holder.itemView.setOnClickListener(View.OnClickListener { v ->
-            val intent = Intent(v.context, SpecificChat::class.java)
-            intent.putExtra("name", firebaseModel.name)
-            intent.putExtra("receiveruid", firebaseModel.id)
-            intent.putExtra("imageuri", firebaseModel.image)
-            v.context.startActivity(intent)
-        })
+        holder.bindView(listUser[position])
     }
 
 
@@ -55,10 +39,27 @@ class ChatAdapter() : RecyclerView.Adapter<ChatAdapter.NoteViewHolder?>() {
     }
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val parentView: ConstraintLayout = itemView.findViewById(R.id.parent_view)
         val nameOfUser: TextView = itemView.findViewById(R.id.nameOfUser)
         val statusOfUser: CircleImageView = itemView.findViewById(R.id.circleImageViewStatus)
         val avatar: CircleImageView = itemView.findViewById(R.id.cardviewOfUser)
 
+        fun bindView(user: User) {
+            Glide.with(itemView.context).load(user.image).into(avatar)
+            nameOfUser.text = user.name
+            if (user.status == "online") {
+                statusOfUser.visibility = View.VISIBLE
+            } else {
+                statusOfUser.visibility = View.INVISIBLE
+            }
+            parentView.setOnClickListener(View.OnClickListener { v ->
+                val intent = Intent(v.context, SpecificChat::class.java)
+                intent.putExtra("name", user.name)
+                intent.putExtra("receiveruid", user.id)
+                intent.putExtra("imageuri", user.image)
+                v.context.startActivity(intent)
+            })
+        }
     }
 
 }

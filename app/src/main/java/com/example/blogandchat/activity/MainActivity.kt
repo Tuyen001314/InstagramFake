@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Glide.with(this).load(user.image).into(navImgUser)
         }
 
-        loadFragment(HomeFragment())
+        loadFragment(HomeFragment(),"HOME_FRAGMENT")
 
 //        binding.bottomNav.setOnItemSelectedListener {it ->
 //            when (it.itemId) {
@@ -88,23 +88,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (id.itemId) {
                 R.id.home -> {
                     val homeFragment = HomeFragment()
-                    loadFragment(homeFragment)
+                    loadFragment(homeFragment,"HOME_FRAGMENT")
                 }
 
                 R.id.message -> {
                     val chatFragment = ChatFragment()
-                    loadFragment(chatFragment)
+                    loadFragment(chatFragment,"CHAT_FRAGMENT")
                 }
 
                 R.id.search -> {
                     val searchFragment = SearchFragment()
-                    loadFragment(searchFragment)
+                    loadFragment(searchFragment,"SEARCH_FRAGMENT")
                 }
 
                 R.id.favorites -> {
                     val favoriteFragment = FavoriteFragment()
-                    loadFragment(favoriteFragment)
+                    loadFragment(favoriteFragment,"FAVORITE_FRAGMENT")
                 }
+
                 else -> {
 
                 }
@@ -126,13 +127,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun loadFragment(fragment: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        // transaction.hide(fragment)
-        transaction.replace(R.id.container, fragment)
-        // transaction.addToBackStack(null)
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-        transaction.commit()
+    private fun loadFragment(fragment: Fragment,tag:String) {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.container)
+        if (currentFragment?.javaClass != fragment.javaClass) {
+            val transaction = supportFragmentManager.beginTransaction()
+            // transaction.hide(fragment)
+            transaction.replace(R.id.container, fragment,tag)
+            transaction.addToBackStack(null)
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            transaction.commit()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
