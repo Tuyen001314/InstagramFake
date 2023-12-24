@@ -30,6 +30,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var user: User
+    lateinit var pagerAdapter: FragmentNavigator
+    private val homeFragment by lazy { HomeFragment() }
+    private val favoriteFragment by lazy { FavoriteFragment() }
+    private val chatFragment by lazy { ChatFragment() }
+    private val searchFragment by lazy { SearchFragment() }
+
     // private lateinit var bottomNav: BottomNavigationView
 
     @SuppressLint("ResourceType")
@@ -54,7 +60,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Glide.with(this).load(user.image).into(navImgUser)
         }
 
-        loadFragment(HomeFragment(),"HOME_FRAGMENT")
+        setupPager()
 
 //        binding.bottomNav.setOnItemSelectedListener {it ->
 //            when (it.itemId) {
@@ -87,30 +93,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.bottomNav.setOnItemSelectedListener { id ->
             when (id.itemId) {
                 R.id.home -> {
-                    val homeFragment = HomeFragment()
-                    loadFragment(homeFragment,"HOME_FRAGMENT")
-                }
-
-                R.id.message -> {
-                    val chatFragment = ChatFragment()
-                    loadFragment(chatFragment,"CHAT_FRAGMENT")
-                }
-
-                R.id.search -> {
-                    val searchFragment = SearchFragment()
-                    loadFragment(searchFragment,"SEARCH_FRAGMENT")
+                    binding.pagger2.currentItem = 0
+                    true
                 }
 
                 R.id.favorites -> {
-                    val favoriteFragment = FavoriteFragment()
-                    loadFragment(favoriteFragment,"FAVORITE_FRAGMENT")
+                    binding.pagger2.currentItem = 1
+                    true
+                }
+
+                R.id.search -> {
+                    binding.pagger2.currentItem = 2
+                    true
+                }
+
+                R.id.message -> {
+                    binding.pagger2.currentItem = 3
+                    true
                 }
 
                 else -> {
-
+                    false
                 }
             }
-            true
         }
 
         actionBarDrawerToggle =
@@ -127,16 +132,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun loadFragment(fragment: Fragment,tag:String) {
-        val currentFragment = supportFragmentManager.findFragmentById(R.id.container)
-        if (currentFragment?.javaClass != fragment.javaClass) {
-            val transaction = supportFragmentManager.beginTransaction()
-            // transaction.hide(fragment)
-            transaction.replace(R.id.container, fragment,tag)
-            transaction.addToBackStack(null)
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            transaction.commit()
-        }
+    fun setupPager() {
+        pagerAdapter = FragmentNavigator(this.supportFragmentManager, lifecycle)
+        pagerAdapter.addFragment(homeFragment)
+        pagerAdapter.addFragment(favoriteFragment)
+        pagerAdapter.addFragment(searchFragment)
+        pagerAdapter.addFragment(chatFragment)
+        binding.pagger2.offscreenPageLimit = pagerAdapter.itemCount
+        binding.pagger2.adapter = pagerAdapter
+        binding.pagger2.isUserInputEnabled = false // disable swiping
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
