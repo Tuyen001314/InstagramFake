@@ -19,3 +19,22 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Firebase Authentication
+-keepnames class com.google.firebase.auth.** { *; }
+
+# Firebase Realtime Database
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepclassmembers class com.google.firebase.database.** { *; }
+
+# Firebase Cloud Firestore
+-keepnames class com.google.firebase.firestore.** { *; }
+
+-keep class com.example.blogandchat.model.** {
+    *;
+}
+
+
+-printmapping myapplication.txt
+-printconfiguration proguard-merged-config.txt

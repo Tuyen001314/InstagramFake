@@ -71,7 +71,6 @@ class FavoriteFragment : Fragment() {
 
             })
         }!!
-        listRequest.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = RecyclerView.HORIZONTAL
         listRequest.layoutManager = linearLayoutManager
@@ -94,7 +93,6 @@ class FavoriteFragment : Fragment() {
 
             })
         }!!
-        listSuggest.setHasFixedSize(true)
         linearLayoutManager = LinearLayoutManager(context)
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         listSuggest.layoutManager = linearLayoutManager

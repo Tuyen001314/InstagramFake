@@ -9,6 +9,11 @@ plugins {
 android {
     compileSdk 33
 
+    lintOptions {
+        checkReleaseBuilds true
+        abortOnError false
+    }
+
     defaultConfig {
         applicationId "com.example.blogandchat"
         minSdk 29
@@ -21,7 +26,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
