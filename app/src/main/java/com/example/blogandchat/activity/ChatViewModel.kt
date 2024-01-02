@@ -1,12 +1,15 @@
 package com.example.blogandchat.activity
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.blogandchat.App
 import com.example.blogandchat.model.Message
 import com.example.blogandchat.utils.AppKey
+import com.example.blogandchat.utils.convertVideoToByteArray
 import com.example.blogandchat.utils.optimizeAndConvertImageToByteArray
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -128,12 +131,54 @@ class ChatViewModel : ViewModel() {
                     timeRequest["id"] = mReceiverUid.toString()
                     timeRequest["timestamp"] = FieldValue.serverTimestamp()
                     timeRequest["timeseen"] = "0"
-                    timeRequest["last_message"] = lastMessage?.toMap() ?: ""
+                    timeRequest["last_message"] =
+                        if (lastMessage.type == 0) lastMessage?.toMap() else Message(
+                            message = "",
+                            type = lastMessage.type,
+                            timeStamp = lastMessage.timeStamp,
+                            currentTime = lastMessage.currentTime,
+                            senderId = lastMessage.senderId
+                        )
                     FirebaseFirestore.getInstance()
                         .collection("users/${firebaseAuth.uid}/message")
                         .document(mReceiverUid.toString())
                         .set(timeRequest)
                 }
         }
+    }
+
+    fun uploadVideo(
+        uri: Uri,
+        senderRoom: String,
+        receiverRoom: String,
+    ) {
+        CoroutineScope(IO).launch {
+            val enterdMessage = convertVideoToByteArray(App.instance.applicationContext, uri)
+            val date = Date()
+            val currentTime = simpleDateFormat.format(calendar.time)
+            val message = firebaseAuth.uid?.let { it1 ->
+                Message(
+                    currentTime = currentTime,
+                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf()),
+                    senderId = it1,
+                    timeStamp = date.time,
+                    type = 2
+                )
+            }
+
+            firebaseDatabase.reference.child("chats")
+                .child(senderRoom)
+                .child("messages")
+                .push().setValue(message).addOnCompleteListener(OnCompleteListener<Void?> {
+                    firebaseDatabase.reference
+                        .child("chats")
+                        .child(receiverRoom)
+                        .child("messages")
+                        .push()
+                        .setValue(message).addOnCompleteListener(OnCompleteListener<Void?> { })
+                })
+
+        }
+
     }
 }

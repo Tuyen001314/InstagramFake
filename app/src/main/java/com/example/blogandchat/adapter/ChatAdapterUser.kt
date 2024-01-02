@@ -60,17 +60,17 @@ class ChatAdapterUser(
         fun bindView(user: User, message: Message) {
             AppKey.calculateKey(user.publicKey.toString())
             Glide.with(parentView.context).load(user.image).into(avatar)
-            if (message.type != 1) {
+            if (message.type == 0) {
                 if (message.senderId == FirebaseAuth.getInstance().uid) {
                         lastMessage.text = "Bạn: " + message.message
                 } else {
                    lastMessage.text = message.message
                 }
-            } else {
+            } else  {
                 if (message.senderId == FirebaseAuth.getInstance().uid) {
-                    lastMessage.text = "Bạn: Hình ảnh"
+                    lastMessage.text = if(message.type == 1) "Bạn: Hình ảnh" else "Bạn: Video"
                 } else {
-                    lastMessage.text = "Hình ảnh"
+                    lastMessage.text =  if(message.type == 1) "Hình ảnh" else "Video"
                 }
             }
             nameOfUser.text = user.name

@@ -21,6 +21,15 @@ android {
         versionCode 1
         versionName "1.0"
 
+//        buildConfigField("String", "KEY_ALIAS",'"eckeypair"')
+//        buildConfigField("String", "TRANSFORMATION", '"AES/ECB/PKCS5Padding"')
+//        buildConfigField("String", "KEYSTORE_TYPE",'"AndroidKeyStore"')
+//        buildConfigField("String", "STD_NAME", '"secp256r1"')
+//        buildConfigField("String", "KF_ALG", '"EC"')
+//        buildConfigField("String", "KA_ALG", '"ECDH"')
+//        buildConfigField("String", "SKS_ALG", '"AES"')
+
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -53,6 +62,7 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.6.1'
+    implementation("androidx.activity:activity-ktx:1.7.0")
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.firebase:firebase-auth-ktx:21.0.8'
     implementation 'com.google.firebase:firebase-database-ktx:20.0.6'
@@ -64,7 +74,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging-ktx:23.1.0'
     //implementation 'androidx.media3:media3-exoplayer:1.2.0'
     testImplementation 'junit:junit:4.13.2'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.7.20'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
@@ -81,7 +91,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
 
     //EncryptSharePreference
-    implementation("androidx.security:security-crypto:1.0.0")
+    implementation "androidx.security:security-crypto:1.1.0-alpha06"
 
     // For Identity Credential APIs
     implementation("androidx.security:security-identity-credential:1.0.0-alpha03")

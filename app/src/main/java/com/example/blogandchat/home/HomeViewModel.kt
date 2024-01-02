@@ -124,7 +124,6 @@ class HomeViewModel : ViewModel() {
                 for (item in data) {
                     fireStore.collection("users").document(item.id).get().addOnSuccessListener {
                         val user = it.toObject(User::class.java)
-                        println(user?.name.toString())
                         user?.let { it1 -> listFriend.add(it1) }
                     }.await()
                 }

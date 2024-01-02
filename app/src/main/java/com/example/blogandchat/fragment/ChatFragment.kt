@@ -4,9 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
@@ -17,17 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.ChatAdapter
 import com.example.blogandchat.adapter.ChatAdapterUser
+import com.example.blogandchat.adapter.SearchUserAdapter
 import com.example.blogandchat.databinding.FragmentChatBinding
-import com.example.blogandchat.model.Message
 import com.example.blogandchat.model.User
 import com.example.blogandchat.model.UserMessageModel
-import com.example.blogandchat.utils.AppKey
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Locale
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,6 +37,8 @@ class ChatFragment : Fragment() {
     private val viewModel: ChatListViewModel by viewModels()
     private var list: MutableList<User> = ArrayList()
     private var list1 = mutableListOf<UserMessageModel>()
+    private var friendList = mutableListOf<User>()
+    lateinit var searchAdapter: SearchUserAdapter
     private lateinit var binding: FragmentChatBinding
 
     // private lateinit var listenerRegistration: ListenerRegistration
@@ -60,22 +56,21 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.fetchListUser()
-        val searchChat: SearchView = view.findViewById(R.id.searchChat)
-
-
         val adapter = ChatAdapter(requireContext(), list)
-        binding.recyclerViewChat.setHasFixedSize(true)
         val linearLayoutManagerHorizontal = LinearLayoutManager(requireContext())
         linearLayoutManagerHorizontal.orientation = RecyclerView.HORIZONTAL
         binding.recyclerViewChat.layoutManager = linearLayoutManagerHorizontal
         binding.recyclerViewChat.adapter = adapter
 
-       val  adapterUser = ChatAdapterUser(list1)
-        binding.recyclerViewChat1.setHasFixedSize(true)
+        val adapterUser = ChatAdapterUser(list1)
         val linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         binding.recyclerViewChat1.layoutManager = linearLayoutManager
         binding.recyclerViewChat1.adapter = adapterUser
+
+        searchAdapter = SearchUserAdapter()
+        binding.rcSearch.layoutManager = LinearLayoutManager(requireContext())
+        binding.rcSearch.adapter = searchAdapter
 
         viewModel.pairLiveData.observe(viewLifecycleOwner) {
             list.clear()
@@ -87,46 +82,63 @@ class ChatFragment : Fragment() {
             adapter.notifyDataSetChanged()
             adapterUser.notifyDataSetChanged()
         }
+        viewModel.listFriend.observe(viewLifecycleOwner) {
+            friendList = it
+            searchAdapter.submitList(friendList)
+        }
 
 
 
-        searchChat.setOnQueryTextListener(object :
+        binding.searchChat.setOnCloseListener(object : SearchView.OnCloseListener{
+            override fun onClose(): Boolean {
+                searchAdapter.submitList(friendList)
+                return false
+            }
+
+        })
+        binding.searchChat.setOnSearchClickListener {
+            binding.rcSearch.visibility = View.VISIBLE
+        }
+        binding.searchChat.setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(msg: String): Boolean {
-                // inside on query text change method we are
-                // calling a method to filter our recycler view.
                 filter(msg)
                 return false
             }
         })
+
+        binding.searchChat.setOnQueryTextFocusChangeListener(OnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {
+                binding.rcSearch.visibility = View.GONE
+            }
+            else{
+                binding.rcSearch.visibility = View.VISIBLE
+
+            }
+        })
+
+
     }
 
-    private fun filter(text: String) {
-        // creating a new array list to filter our data.
-        val filteredlist: MutableList<User> = ArrayList()
 
-        // running a for loop to compare elements.
-        for (item in list) {
-            // checking if the entered string matched with any item of our recycler view.
-            if (item.name.toLowerCase().contains(text.toLowerCase())) {
-                // if the item is matched we are
-                // adding it to our filtered list.
+
+    private fun filter(text: String) {
+        val filteredlist: MutableList<User> = ArrayList()
+        for (item in friendList) {
+            if (item.name.lowercase(Locale.getDefault())
+                    .contains(text.lowercase(Locale.getDefault()))
+            ) {
                 filteredlist.add(item)
             }
         }
         if (filteredlist.isEmpty()) {
-            // if no item is added in filtered list we are
-            // displaying a toast message as no data found.
             Toast.makeText(requireContext(), "No Data Found..", Toast.LENGTH_SHORT).show()
-            //adapterUser.filterList(filteredlist)
         } else {
-            // at last we are passing that filtered
-            // list to our adapter class.
-          //  adapterUser.filterList(filteredlist)
+            searchAdapter.submitList(filteredlist)
         }
     }
 
@@ -138,4 +150,5 @@ class ChatFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
     }
+
 }

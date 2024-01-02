@@ -7,7 +7,7 @@ data class Message(
     val currentTime: String = "",
     val timeStamp: Long? = 0,
     val senderId: String = "",
-    val message: String = "",
+    var message: String = "",
     val type: Int? = 0
 
 ) : Parcelable {

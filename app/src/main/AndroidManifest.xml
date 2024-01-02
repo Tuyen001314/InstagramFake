@@ -3,14 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.blogandchat">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera.any" />
+
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -18,19 +24,41 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="Instagram"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:largeHeap="true"
         android:theme="@style/Theme.BlogAndChat"
+        android:usesCleartextTraffic="false"
         tools:targetApi="31">
+        <meta-data
+            android:name="key_alias"
+            android:value="eckeypair" />
+        <meta-data
+            android:name="KA_ALG"
+            android:value="ECDH" />
+        <meta-data
+            android:name="KF_ALG"
+            android:value="EC" />
+        <meta-data
+            android:name="KEYSTORE_TYPE"
+            android:value="AndroidKeyStore" />
+        <meta-data
+            android:name="STD_NAME"
+            android:value="secp256r1" />
+
+        <meta-data
+            android:name="TRANSFORMATION"
+            android:value="AES/ECB/PKCS5Padding" />
+        <meta-data
+            android:name="SKS_ALG"
+            android:value="AES" />
 
         <activity
             android:name=".activity.CropperActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".activity.UpdateActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".activity.SpecificChat"
             android:exported="false"
@@ -39,16 +67,16 @@
             android:name=".activity.SettingActivity"
             android:exported="false"
             android:label="@string/title_activity_setting"
-            android:parentActivityName=".activity.MainActivity"/>
+            android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".activity.SignUpActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".activity.SignInActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".activity.SetUpActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".activity.OtherUserProfile"
             android:exported="false" />
@@ -69,11 +97,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <activity
             android:name=".activity.MainActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
@@ -86,7 +114,7 @@
 
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
     </application>

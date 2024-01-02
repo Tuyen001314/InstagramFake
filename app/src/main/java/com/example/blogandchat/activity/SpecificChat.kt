@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -15,9 +16,10 @@ import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,10 +30,18 @@ import com.example.blogandchat.adapter.MessageAdapter
 import com.example.blogandchat.databinding.ActivitySpecificChatBinding
 import com.example.blogandchat.model.Message
 import com.example.blogandchat.utils.AppKey
+import com.example.blogandchat.utils.convertUriToBitmap
+import com.example.blogandchat.utils.createFileFromUri
+import com.example.blogandchat.utils.getVideoFileSize
+import com.example.blogandchat.utils.isVideoFile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import java.io.ByteArrayOutputStream
-import java.text.SimpleDateFormat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -42,8 +52,7 @@ class SpecificChat : AppCompatActivity() {
     private var messageList: MutableList<Message> = ArrayList()
     private lateinit var messagesAdapter: MessageAdapter
     private lateinit var binding: ActivitySpecificChatBinding
-    lateinit var getContent: ActivityResultLauncher<String>
-    private lateinit var mGetContent: ActivityResultLauncher<String>
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_IMAGE_PICKER = 2
 
@@ -56,25 +65,72 @@ class SpecificChat : AppCompatActivity() {
     lateinit var databaseReference: DatabaseReference
     val postListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            messageList.clear()
-            for (snapshot1 in snapshot.children) {
-                val message: Message? = snapshot1.getValue(Message::class.java)
-                if (message != null && !messageList.contains(message)) {
-                    messageList.add(message)
-                    Log.e(">>>>>>>>>>>>", "Value is: $message");
+            coroutineScope.launch(IO) {
+                for (snapshot1 in snapshot.children) {
+                    val message: Message? = snapshot1.getValue(Message::class.java)
+                    if (message != null && (messageList.find { it.timeStamp == message.timeStamp } == null)) {
+                        if (message.type == 0) {
+                            AppKey.decrypt(message.message)?.let {
+                                message.message = it
+                            }
+                            messageList.add(message)
+                        } else {
+                            val data = AppKey.decryptByteArray(message.message)
+                            if (data.isNotEmpty()) {
+                                message.message = Base64.encodeToString(data, Base64.DEFAULT)
+                                messageList.add(message)
+                            }
+                        }
+                    }
+                }
+                withContext(Main) {
+                    messagesAdapter.notifyDataSetChanged()
+                    binding.recycleChat.scrollToPosition(messageList.size - 1)
                 }
             }
-            messagesAdapter.notifyDataSetChanged()
-            viewModel.updateLastMessage(
-                mReceiverUid,
-                snapshot.children.last().getValue(Message::class.java) ?: Message()
-            )
-            binding.recycleChat.scrollToPosition(messageList.size - 1)
+
+            if (snapshot.exists() && snapshot.children.last().exists()) {
+                viewModel.updateLastMessage(
+                    mReceiverUid,
+                    snapshot.children.last().getValue(Message::class.java) ?: Message()
+                )
+            }
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
             Log.e(">>>>>>>>>>>>>", databaseError.message)
 
+        }
+    }
+
+    val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri?.let { isVideoFile(this, it) } == true) {
+            CoroutineScope(IO).launch {
+                val size = getVideoFileSize(uri, this@SpecificChat)?.div(1024 * 1024) ?: 0
+                withContext(Main) {
+                    if (size <= 10L) {
+                        uri.let { viewModel.uploadVideo(it, senderRoom, receiverRoom) }
+                    } else {
+                        Toast.makeText(
+                            this@SpecificChat,
+                            "Video có kích thước tối đa 10MB",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }
+            }
+        } else {
+            val bitmap = convertUriToBitmap(this, uri)
+            bitmap?.let {
+                viewModel.uploadImage(
+                    it, senderRoom = senderRoom,
+                    mReceiverUid = mReceiverUid,
+                    receiverRoom = receiverRoom
+                )
+            }
         }
     }
 
@@ -134,8 +190,10 @@ class SpecificChat : AppCompatActivity() {
         }
 
         binding.imgPick.setOnClickListener {
-            openGalleryForImage()
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
         }
+
+        binding.imgBack.setOnClickListener { finish() }
 
 
         binding.imageBtnChat.setOnClickListener(View.OnClickListener {
@@ -197,19 +255,6 @@ class SpecificChat : AppCompatActivity() {
                 receiverRoom = receiverRoom
             )
         }
-        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_IMAGE_PICKER) {
-
-            data?.data?.let {
-                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, it);
-                viewModel.uploadImage(
-                    bitmap, senderRoom = senderRoom,
-                    mReceiverUid = mReceiverUid,
-                    receiverRoom = receiverRoom
-                )
-            }
-
-        }
-
     }
 
     fun requestPermission() {

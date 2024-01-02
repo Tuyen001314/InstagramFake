@@ -30,8 +30,15 @@ class ChatListViewModel() : ViewModel() {
     val listUser: LiveData<MutableList<User>> = _listUser
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val firebaseFirestore = FirebaseFirestore.getInstance()
+    private val idUser = FirebaseAuth.getInstance().uid
     private val _pairLiveData = MutableLiveData<MutableList<UserMessageModel>>()
     val pairLiveData: LiveData<MutableList<UserMessageModel>> = _pairLiveData
+    private val _listFriend = MutableLiveData<MutableList<User>>()
+    val listFriend: LiveData<MutableList<User>> = _listFriend
+
+    init {
+        getFriends()
+    }
     fun fetchListUser() {
         val id = firebaseAuth.uid
         viewModelScope.launch {
@@ -76,7 +83,7 @@ class ChatListViewModel() : ViewModel() {
                                         timeStamp = lastMessageMap["timeStamp"] as? Long ?: 0,
                                         senderId = lastMessageMap["senderId"] as? String ?: "",
                                         message = lastMessageMap["message"] as? String ?: "",
-                                        type = lastMessageMap["type"] as? Int ?: 0
+                                        type = (lastMessageMap["type"] as Long).toInt()
                                     )
 
                                     lastMessage = DataMessageUserModel(idMessage, message)
@@ -121,5 +128,21 @@ class ChatListViewModel() : ViewModel() {
         }
 
 
+    }
+    fun getFriends() {
+        viewModelScope.launch {
+            val job = viewModelScope.async {
+                val listFriend = mutableListOf<User>()
+                val data = firebaseFirestore.collection("users/$idUser/friends").get().await()
+                for (item in data) {
+                    firebaseFirestore.collection("users").document(item.id).get().addOnSuccessListener {
+                        val user = it.toObject(User::class.java)
+                        user?.let { it1 -> listFriend.add(it1) }
+                    }.await()
+                }
+                listFriend
+            }
+            _listFriend.postValue(job.await())
+        }
     }
 }

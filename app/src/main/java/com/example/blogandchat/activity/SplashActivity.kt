@@ -18,7 +18,7 @@ class SplashActivity : AppCompatActivity() {
 
 
         Handler().postDelayed({
-            var currentUserId = FireStore().getCurrentUserId()
+            val currentUserId = FireStore().getCurrentUserId()
             if (currentUserId.isNotEmpty()) {
                 FireStore().updatePublicKeyUser(AppKey.getPublicKey())
                 startActivity(Intent(this, MainActivity::class.java))
