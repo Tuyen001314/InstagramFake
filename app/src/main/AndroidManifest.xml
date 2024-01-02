@@ -32,26 +32,26 @@
         tools:targetApi="31">
         <meta-data
             android:name="key_alias"
-            android:value="eckeypair" />
+            android:value="${key_alias}" />
         <meta-data
             android:name="KA_ALG"
-            android:value="ECDH" />
+            android:value="${KA_ALG}" />
         <meta-data
             android:name="KF_ALG"
-            android:value="EC" />
+            android:value="${KF_ALG}" />
         <meta-data
             android:name="KEYSTORE_TYPE"
-            android:value="AndroidKeyStore" />
+            android:value="${KEYSTORE_TYPE}" />
         <meta-data
             android:name="STD_NAME"
-            android:value="secp256r1" />
+            android:value="${STD_NAME}" />
 
         <meta-data
             android:name="TRANSFORMATION"
-            android:value="AES/ECB/PKCS5Padding" />
+            android:value="${TRANSFORMATION}" />
         <meta-data
             android:name="SKS_ALG"
-            android:value="AES" />
+            android:value="${SKS_ALG}" />
 
         <activity
             android:name=".activity.CropperActivity"
