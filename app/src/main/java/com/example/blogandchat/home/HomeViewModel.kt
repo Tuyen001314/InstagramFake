@@ -11,6 +11,8 @@ import com.example.blogandchat.model.Post
 import com.example.blogandchat.model.PostDetailModel
 import com.example.blogandchat.model.User
 import com.example.blogandchat.utils.AppKey
+import com.example.blogandchat.utils.byteArrayToString
+import com.example.blogandchat.utils.generateRandomIV
 import com.example.blogandchat.utils.optimizeAndConvertImageToByteArray
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -161,16 +163,18 @@ class HomeViewModel : ViewModel() {
     ) {
         CoroutineScope(IO).launch {
             AppKey.calculateKey(publicKey)
+            val iv = generateRandomIV()
             val enterdMessage = optimizeAndConvertImageToByteArray(bitmap)
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
             val message = firebaseAuth.uid?.let { it1 ->
                 Message(
                     currentTime = currentTime,
-                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf()),
+                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf(), iv),
                     senderId = it1,
                     timeStamp = date.time,
-                    type = 1
+                    type = 1,
+                    iv = iv.byteArrayToString()
                 )
             }
 
@@ -185,6 +189,11 @@ class HomeViewModel : ViewModel() {
                     fireStore
                         .collection("users/${firebaseAuth.uid}/message")
                         .document(mReceiverUid.toString())
+                        .set(timeRequest)
+
+                    fireStore
+                        .collection("users/${mReceiverUid}/message")
+                        .document("${firebaseAuth.uid}")
                         .set(timeRequest)
                 }
 

@@ -57,6 +57,7 @@ class ChatAdapter() : RecyclerView.Adapter<ChatAdapter.NoteViewHolder?>() {
                 intent.putExtra("name", user.name)
                 intent.putExtra("receiveruid", user.id)
                 intent.putExtra("imageuri", user.image)
+                intent.putExtra("publicKey", user.publicKey)
                 v.context.startActivity(intent)
             })
         }

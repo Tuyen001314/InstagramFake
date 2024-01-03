@@ -17,6 +17,7 @@ import java.security.spec.ECGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
 import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object AppKey {
@@ -28,7 +29,7 @@ object AppKey {
     val bundle = appInfo.metaData
     private val KEY_ALIAS = bundle.getString("key_alias")
     private val KEYSTORE_TYPE = bundle.getString("KEYSTORE_TYPE")
-    private val stdName =  bundle.getString("STD_NAME")
+    private val stdName = bundle.getString("STD_NAME")
     private val KF_ALG = bundle.getString("KF_ALG")
     private val KA_ALG = bundle.getString("KA_ALG")
     private val SKS_ALG = bundle.getString("SKS_ALG")
@@ -90,21 +91,22 @@ object AppKey {
         secretKey = SecretKeySpec(sharedSecret, SKS_ALG)
     }
 
-    fun encrypt(plainText: String): String {
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+    fun encrypt(plainText: String, iv: ByteArray): String {
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
         val encryptedBytes = cipher.doFinal(plainText.toByteArray())
         return Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
     }
 
-    fun encrypt(byteArray: ByteArray): String {
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+    fun encrypt(byteArray: ByteArray, iv: ByteArray): String {
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(128, iv))
         val encryptedBytes = cipher.doFinal(byteArray)
         return Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
     }
 
-    fun decrypt(data: String?): String? {
+    fun decrypt(data: String?, iv: String): String? {
         try {
-            cipher.init(Cipher.DECRYPT_MODE, secretKey)
+            val ivByteArray = Base64.decode(iv, Base64.DEFAULT)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, ivByteArray))
             val encryptedBytes: ByteArray = Base64.decode(data, Base64.DEFAULT)
             val decryptedBytes = cipher.doFinal(encryptedBytes)
             return String(decryptedBytes, StandardCharsets.UTF_8)
@@ -114,9 +116,10 @@ object AppKey {
         return null
     }
 
-    fun decryptByteArray(data: String): ByteArray {
+    fun decryptByteArray(data: String, iv: String): ByteArray {
         try {
-            cipher.init(Cipher.DECRYPT_MODE, secretKey)
+            val ivByteArray = Base64.decode(iv, Base64.DEFAULT)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(128, ivByteArray))
             val encryptedBytes: ByteArray = Base64.decode(data, Base64.DEFAULT)
             return cipher.doFinal(encryptedBytes)
         } catch (e: Exception) {

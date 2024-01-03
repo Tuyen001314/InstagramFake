@@ -15,6 +15,10 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.security.SecureRandom
+
+
+
 
 
 fun optimizeAndConvertImageToByteArray(bitmap: Bitmap): ByteArray? {
@@ -161,4 +165,11 @@ suspend fun getVideoFileSize(uri: Uri, context: Context): Long? {
 
         return@withContext fileSize
     }
+}
+
+    fun generateRandomIV(): ByteArray {
+    val secureRandom = SecureRandom()
+    val iv = ByteArray(12) // 96 bits IV for GCM
+    secureRandom.nextBytes(iv)
+    return iv
 }

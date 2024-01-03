@@ -22,7 +22,7 @@ import com.google.firebase.firestore.ServerTimestamp
 import de.hdodenhof.circleimageview.CircleImageView
 
 class ChatAdapterUser(
-    val  listUser: MutableList<UserMessageModel>
+    val listUser: MutableList<UserMessageModel>,
 ) : RecyclerView.Adapter<ChatAdapterUser.NoteViewHolder?>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -33,16 +33,6 @@ class ChatAdapterUser(
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         holder.bindView(listUser[position].user, listUser[position].message)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun filterList(filterlist: MutableList<User>) {
-        // below line is to add our filtered
-        // list in our course array list.
-        //listUser = filterlist
-        // below line is to notify our adapter
-        // as change in recycler view data.
-        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
@@ -58,19 +48,18 @@ class ChatAdapterUser(
 
 
         fun bindView(user: User, message: Message) {
-            AppKey.calculateKey(user.publicKey.toString())
             Glide.with(parentView.context).load(user.image).into(avatar)
             if (message.type == 0) {
                 if (message.senderId == FirebaseAuth.getInstance().uid) {
-                        lastMessage.text = "Bạn: " + message.message
+                    lastMessage.text = "Bạn: " + message.message
                 } else {
-                   lastMessage.text = message.message
+                    lastMessage.text = message.message
                 }
-            } else  {
+            } else {
                 if (message.senderId == FirebaseAuth.getInstance().uid) {
-                    lastMessage.text = if(message.type == 1) "Bạn: Hình ảnh" else "Bạn: Video"
+                    lastMessage.text = if (message.type == 1) "Bạn: Hình ảnh" else "Bạn: Video"
                 } else {
-                    lastMessage.text =  if(message.type == 1) "Hình ảnh" else "Video"
+                    lastMessage.text = if (message.type == 1) "Hình ảnh" else "Video"
                 }
             }
             nameOfUser.text = user.name

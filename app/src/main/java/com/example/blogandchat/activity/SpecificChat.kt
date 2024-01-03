@@ -49,7 +49,7 @@ class SpecificChat : AppCompatActivity() {
 
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
-    private var messageList: MutableList<Message> = ArrayList()
+    private var messageList = mutableListOf<Message>()
     private lateinit var messagesAdapter: MessageAdapter
     private lateinit var binding: ActivitySpecificChatBinding
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -70,12 +70,12 @@ class SpecificChat : AppCompatActivity() {
                     val message: Message? = snapshot1.getValue(Message::class.java)
                     if (message != null && (messageList.find { it.timeStamp == message.timeStamp } == null)) {
                         if (message.type == 0) {
-                            AppKey.decrypt(message.message)?.let {
+                            AppKey.decrypt(message.message, message.iv)?.let {
                                 message.message = it
                             }
                             messageList.add(message)
                         } else {
-                            val data = AppKey.decryptByteArray(message.message)
+                            val data = AppKey.decryptByteArray(message.message, message.iv)
                             if (data.isNotEmpty()) {
                                 message.message = Base64.encodeToString(data, Base64.DEFAULT)
                                 messageList.add(message)
@@ -84,7 +84,7 @@ class SpecificChat : AppCompatActivity() {
                     }
                 }
                 withContext(Main) {
-                    messagesAdapter.notifyDataSetChanged()
+                    messagesAdapter.submitList(messageList)
                     binding.recycleChat.scrollToPosition(messageList.size - 1)
                 }
             }
@@ -166,7 +166,7 @@ class SpecificChat : AppCompatActivity() {
             firebaseDatabase.reference.child("chats").child(senderRoom).child("messages")
 
 
-        messagesAdapter = MessageAdapter(this@SpecificChat, messageList)
+        messagesAdapter = MessageAdapter()
 
         binding.recycleChat.adapter = messagesAdapter
 

@@ -2,6 +2,7 @@ package com.example.blogandchat.activity
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Base64
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.blogandchat.App
 import com.example.blogandchat.model.Message
 import com.example.blogandchat.utils.AppKey
+import com.example.blogandchat.utils.byteArrayToString
 import com.example.blogandchat.utils.convertVideoToByteArray
+import com.example.blogandchat.utils.generateRandomIV
 import com.example.blogandchat.utils.optimizeAndConvertImageToByteArray
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -37,16 +40,18 @@ class ChatViewModel : ViewModel() {
         receiverRoom: String,
     ) {
         viewModelScope.launch {
+            val iv = generateRandomIV()
             val enterdMessage = optimizeAndConvertImageToByteArray(bitmap)
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
             val message = firebaseAuth.uid?.let { it1 ->
                 Message(
                     currentTime = currentTime,
-                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf()),
+                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf(), iv),
                     senderId = it1,
                     timeStamp = date.time,
-                    type = 1
+                    type = 1,
+                    iv = Base64.encodeToString(iv, Base64.DEFAULT)
                 )
             }
 
@@ -85,12 +90,13 @@ class ChatViewModel : ViewModel() {
         receiverRoom: String,
     ) {
         viewModelScope.launch {
+            val iv = generateRandomIV()
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
             val message = firebaseAuth.uid?.let { it1 ->
                 Message(
-                    currentTime = currentTime, message = AppKey.encrypt(enterdMessage),
-                    senderId = it1, timeStamp = date.time, type = 0
+                    currentTime = currentTime, message = AppKey.encrypt(enterdMessage, iv),
+                    senderId = it1, timeStamp = date.time, type = 0, iv = iv.byteArrayToString()
                 )
             }
 
@@ -137,11 +143,17 @@ class ChatViewModel : ViewModel() {
                             type = lastMessage.type,
                             timeStamp = lastMessage.timeStamp,
                             currentTime = lastMessage.currentTime,
-                            senderId = lastMessage.senderId
+                            senderId = lastMessage.senderId,
+                            iv = lastMessage.iv
                         )
                     FirebaseFirestore.getInstance()
                         .collection("users/${firebaseAuth.uid}/message")
                         .document(mReceiverUid.toString())
+                        .set(timeRequest)
+
+                    FirebaseFirestore.getInstance()
+                        .collection("users/${mReceiverUid}/message")
+                        .document("${firebaseAuth.uid}")
                         .set(timeRequest)
                 }
         }
@@ -153,16 +165,18 @@ class ChatViewModel : ViewModel() {
         receiverRoom: String,
     ) {
         CoroutineScope(IO).launch {
+            val iv = generateRandomIV()
             val enterdMessage = convertVideoToByteArray(App.instance.applicationContext, uri)
             val date = Date()
             val currentTime = simpleDateFormat.format(calendar.time)
             val message = firebaseAuth.uid?.let { it1 ->
                 Message(
                     currentTime = currentTime,
-                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf()),
+                    message = AppKey.encrypt(enterdMessage ?: byteArrayOf(), iv),
                     senderId = it1,
                     timeStamp = date.time,
-                    type = 2
+                    type = 2,
+                    iv = iv.byteArrayToString()
                 )
             }
 

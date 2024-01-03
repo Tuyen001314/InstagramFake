@@ -18,9 +18,15 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.system.measureTimeMillis
@@ -39,13 +45,14 @@ class ChatListViewModel() : ViewModel() {
     init {
         getFriends()
     }
+
     fun fetchListUser() {
         val id = firebaseAuth.uid
         viewModelScope.launch {
             try {
                 val data = firebaseFirestore.collection("users/$id/message").get().await()
 
-                val list = async {
+                val list = CoroutineScope(IO).async {
                     val deferredList = data.documents.map { document ->
                         val idUserReceive = document.id
                         async {
@@ -58,7 +65,7 @@ class ChatListViewModel() : ViewModel() {
                     deferredList.awaitAll().filterNotNull()
                 }
 
-                val listMes = async {
+                val listMes = CoroutineScope(IO).async {
                     val deferredList = data.documents.map { documentSnapshot ->
                         val idUserReceive = documentSnapshot.id
                         async {
@@ -78,14 +85,14 @@ class ChatListViewModel() : ViewModel() {
                                 if (lastMessageMap != null) {
                                     // Đây là giá trị của trường "last_message"
                                     val message = Message(
-                                        currentTime = lastMessageMap["currentTime"] as? String
-                                            ?: "",
-                                        timeStamp = lastMessageMap["timeStamp"] as? Long ?: 0,
-                                        senderId = lastMessageMap["senderId"] as? String ?: "",
-                                        message = lastMessageMap["message"] as? String ?: "",
-                                        type = (lastMessageMap["type"] as Long).toInt()
+                                        currentTime = lastMessageMap["currentTime"].toString(),
+                                        timeStamp = (lastMessageMap["timeStamp"] as? Number)?.toLong()
+                                            ?: 0,
+                                        senderId = lastMessageMap["senderId"].toString(),
+                                        message = lastMessageMap["message"].toString(),
+                                        type = (lastMessageMap["type"] as? Number)?.toInt() ?: 0,
+                                        iv = lastMessageMap["iv"].toString()
                                     )
-
                                     lastMessage = DataMessageUserModel(idMessage, message)
                                 }
                             }
@@ -95,32 +102,51 @@ class ChatListViewModel() : ViewModel() {
                     deferredList.awaitAll().filterNotNull()
                 }
 
+                val users = list.await()
+                val messages = listMes.await()
+//                val pairs = mutableListOf<UserMessageModel>()
+//
+//                users.forEach { user ->
+//                    val messageMatching =
+//                        messages.find { it.id == user.id || it.message?.senderId == user.id }
+//                    messageMatching?.let {
+//                        AppKey.calculateKey(user.publicKey.toString())
+//
+//                        val messageDecrypt = if (it.message?.type == 0) {
+//                            AppKey.decrypt(
+//                                messageMatching.message?.message,
+//                                messageMatching.message?.iv.toString()
+//                            )
+//                                ?.let {
+//                                    Message(
+//                                        message = it,
+//                                        senderId = messageMatching.message?.senderId.toString(),
+//                                        currentTime = messageMatching.message?.currentTime.toString(),
+//                                        timeStamp = messageMatching.message?.timeStamp,
+//                                        type = messageMatching.message?.type,
+//                                    )
+//                                }
+//                        } else {
+//                            Message(
+//                                message = "",
+//                                senderId = messageMatching.message?.senderId.toString(),
+//                                currentTime = messageMatching.message?.currentTime.toString(),
+//                                timeStamp = messageMatching.message?.timeStamp,
+//                                type = messageMatching.message?.type,
+//                            )
+//
+//                        }
+//                        pairs.add(UserMessageModel(user, messageDecrypt ?: Message()))
+//                    }
+//                }
+                flow { emit(mappingMessengerUser(users, messages)) }
+                    .onStart {  }
+                    .onCompletion {  }
+                    .collect{
+                        _pairLiveData.postValue(it)
 
-                val pairJob = async {
-                    val pairs = mutableListOf<UserMessageModel>()
-                    list.await().forEach { user ->
-                        listMes.await().forEach { dataMessage ->
-                            if (dataMessage.id == user.id) {
-                                AppKey.calculateKey(user.publicKey.toString())
-                                val messageDecrypt = AppKey.decrypt(dataMessage.message?.message)
-                                    ?.let {
-                                        Message(
-                                            message = it,
-                                            senderId = dataMessage.message?.senderId.toString(),
-                                            currentTime = dataMessage.message?.currentTime.toString(),
-                                            timeStamp = dataMessage.message?.timeStamp,
-                                            type = dataMessage.message?.type
-                                        )
-                                    }
-                                pairs.add(UserMessageModel(user, messageDecrypt ?: Message()))
-                                return@forEach
-                            }
-                        }
                     }
-                    pairs
-                }
 
-                _pairLiveData.postValue(pairJob.await())
             } catch (e: Exception) {
                 // Xử lý các ngoại lệ ở đây
                 e.printStackTrace()
@@ -129,20 +155,64 @@ class ChatListViewModel() : ViewModel() {
 
 
     }
+
     fun getFriends() {
         viewModelScope.launch {
             val job = viewModelScope.async {
                 val listFriend = mutableListOf<User>()
                 val data = firebaseFirestore.collection("users/$idUser/friends").get().await()
                 for (item in data) {
-                    firebaseFirestore.collection("users").document(item.id).get().addOnSuccessListener {
-                        val user = it.toObject(User::class.java)
-                        user?.let { it1 -> listFriend.add(it1) }
-                    }.await()
+                    firebaseFirestore.collection("users").document(item.id).get()
+                        .addOnSuccessListener {
+                            val user = it.toObject(User::class.java)
+                            user?.let { it1 -> listFriend.add(it1) }
+                        }.await()
                 }
                 listFriend
             }
             _listFriend.postValue(job.await())
         }
+    }
+
+    suspend fun mappingMessengerUser(
+        users: List<User>,
+        messages: List<DataMessageUserModel>,
+    ): MutableList<UserMessageModel> {
+        val pairs = mutableListOf<UserMessageModel>()
+
+        users.forEach { user ->
+            val messageMatching =
+                messages.find { it.id == user.id || it.message?.senderId == user.id }
+            messageMatching?.let {
+                AppKey.calculateKey(user.publicKey.toString())
+
+                val messageDecrypt = if (it.message?.type == 0) {
+                    AppKey.decrypt(
+                        messageMatching.message?.message,
+                        messageMatching.message?.iv.toString()
+                    )
+                        ?.let {
+                            Message(
+                                message = it,
+                                senderId = messageMatching.message?.senderId.toString(),
+                                currentTime = messageMatching.message?.currentTime.toString(),
+                                timeStamp = messageMatching.message?.timeStamp,
+                                type = messageMatching.message?.type,
+                            )
+                        }
+                } else {
+                    Message(
+                        message = "",
+                        senderId = messageMatching.message?.senderId.toString(),
+                        currentTime = messageMatching.message?.currentTime.toString(),
+                        timeStamp = messageMatching.message?.timeStamp,
+                        type = messageMatching.message?.type,
+                    )
+
+                }
+                pairs.add(UserMessageModel(user, messageDecrypt ?: Message()))
+            }
+        }
+        return pairs
     }
 }

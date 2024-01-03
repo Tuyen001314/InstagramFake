@@ -12,6 +12,8 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -31,10 +33,17 @@ import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.firebase.auth.FirebaseAuth
 import java.io.File
 
-class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MessageAdapter :
+    ListAdapter<Message, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<Message>() {
+        override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem.timeStamp == newItem.timeStamp
+        }
 
-    private lateinit var context: Context
-    private lateinit var listMessage: MutableList<Message>
+        override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem.iv == newItem.iv
+        }
+
+    }) {
 
     companion object {
         const val VIEW_TYPE_ONE = 1
@@ -43,11 +52,6 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val IMAGE_RECEIVER = 4
         const val VIDEO_SENDER = 5
         const val VIDEO_RECEIVER = 6
-    }
-
-    constructor(context: Context, listMessage: MutableList<Message>) : this() {
-        this.context = context
-        this.listMessage = listMessage
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): RecyclerView.ViewHolder {
@@ -92,7 +96,7 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val message: Message = listMessage[position]
+        val message: Message = getItem(position)
         when (holder) {
             is SenderViewHolder -> {
                 holder.tvMessage.text = message.message
@@ -105,9 +109,9 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
 
             is ImageSenderViewHolder -> {
-                val byteArray = Base64.decode(message.message,Base64.DEFAULT)
+                val byteArray = Base64.decode(message.message, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-                Glide.with(context)
+                Glide.with(holder.itemView.context)
                     .load(bitmap)
                     .into(object : CustomTarget<Drawable>() {
                         override fun onResourceReady(
@@ -125,9 +129,9 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
 
             is ImageReceiverViewHolder -> {
-                val byteArray = Base64.decode(message.message,Base64.DEFAULT)
+                val byteArray = Base64.decode(message.message, Base64.DEFAULT)
                 val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-                Glide.with(context)
+                Glide.with(holder.itemView.context)
                     .load(bitmap)
                     .into(object : CustomTarget<Drawable>() {
                         override fun onResourceReady(
@@ -154,16 +158,29 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    override fun getItemCount(): Int {
-        return listMessage.size
-    }
-
     override fun getItemViewType(position: Int): Int {
-        val message: Message = listMessage[position]
+        val message: Message = getItem(position)
         return if (FirebaseAuth.getInstance().currentUser!!.uid == message.senderId) {
             if (message.type == 0) VIEW_TYPE_ONE else if (message.type == 1) IMAGE_SENDER else VIDEO_SENDER
         } else {
             if (message.type == 0) VIEW_TYPE_TWO else if (message.type == 1) IMAGE_RECEIVER else VIDEO_RECEIVER
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        when (holder) {
+            is VideoReceiverViewHolder -> {
+                holder.releaseExoPlayer()
+            }
+
+            is VideoSenderViewHolder -> {
+                holder.releaseExoPlayer()
+            }
+
+            else -> {
+
+            }
         }
     }
 
@@ -189,12 +206,12 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class VideoReceiverViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val playerView: StyledPlayerView = itemView.findViewById(R.id.video_mess_receive)
         val pbLoading: ProgressBar = itemView.findViewById(R.id.pbLoading)
+        val exoPlayer = ExoPlayer.Builder(itemView.rootView.context).build()
         fun bindView(message: Message) {
-            val byteArray = Base64.decode(message.message,Base64.DEFAULT)
+            val byteArray = Base64.decode(message.message, Base64.DEFAULT)
             val tempFile = File.createTempFile("tempVideo", ".mp4", itemView.context.cacheDir)
             tempFile.writeBytes(byteArray)
 
-            val exoPlayer = ExoPlayer.Builder(itemView.rootView.context).build()
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
@@ -235,17 +252,22 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 exoPlayer.play()
             }
         }
+
+        fun releaseExoPlayer() {
+            exoPlayer.stop()
+            exoPlayer.release()
+        }
     }
 
     inner class VideoSenderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val playerView: StyledPlayerView = itemView.findViewById(R.id.video_mess_send)
         val pbLoading: ProgressBar = itemView.findViewById(R.id.pbLoading)
+        val exoPlayer = ExoPlayer.Builder(itemView.rootView.context).build()
         fun bindView(message: Message) {
-            val byteArray = Base64.decode(message.message,Base64.DEFAULT)
+            val byteArray = Base64.decode(message.message, Base64.DEFAULT)
             val tempFile = File.createTempFile("tempVideo", ".mp4", itemView.context.cacheDir)
             tempFile.writeBytes(byteArray)
 
-            val exoPlayer = ExoPlayer.Builder(itemView.rootView.context).build()
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
@@ -285,6 +307,11 @@ class MessageAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 exoPlayer.playWhenReady = true
                 exoPlayer.play()
             }
+        }
+
+        fun releaseExoPlayer() {
+            exoPlayer.stop()
+            exoPlayer.release()
         }
 
     }
