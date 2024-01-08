@@ -136,7 +136,6 @@ class PostAdapter(
             onClickImage.comment(post.postId.toString(), FirebaseAuth.getInstance().uid.toString())
         }
 
-
         holder.likeImage.setOnClickListener {
             if (!post.isLiked) {
                 post.isLiked = true
