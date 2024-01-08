@@ -62,6 +62,7 @@ class OtherUserProfile : AppCompatActivity() {
                     val user = (document.toObject(User::class.java))
                     Glide.with(this).load(user.image).into(binding.circleImageViewOther)
                     binding.nameUserOther.text = user.name
+                    binding.nickName.text = user.name.replace(" ", "").toLowerCase()
                     break
                 }
             }

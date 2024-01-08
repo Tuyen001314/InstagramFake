@@ -86,6 +86,10 @@ class CommentDialogFragment : BottomSheetDialogFragment() {
 				).show()
 			}
 		}
+
+		adapter.onClickDelete {
+			dismiss()
+		}
 	}
 
 	/*override fun onStart() {
