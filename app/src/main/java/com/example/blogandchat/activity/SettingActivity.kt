@@ -37,9 +37,10 @@ class SettingActivity : AppCompatActivity() {
             .document(FirebaseAuth.getInstance().uid.toString())
 
         docRef.get().addOnSuccessListener { documentSnapshot ->
-            user = documentSnapshot.toObject<com.example.blogandchat.model.User>()!!
+            user = documentSnapshot.toObject<User>()!!
 
-            //binding.edtNameEnter.text = user.name
+            binding.nameUserOther.text = user.name
+            binding.nickName.text = user.name.replace(" ", "").toLowerCase()
             Glide.with(this).load(user.image).into(binding.circleImageView)
         }
 

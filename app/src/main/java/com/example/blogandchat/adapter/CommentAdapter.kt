@@ -28,6 +28,8 @@ class CommentAdapter() : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
     private lateinit var listComments: MutableList<Comments>
     private lateinit var postComments: String
 
+    private lateinit var onClickDelete: () -> Unit
+
     constructor(
         context: Context,
         listComments: MutableList<Comments>,
@@ -99,6 +101,8 @@ class CommentAdapter() : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
                                 "Xóa thành công",
                                 Toast.LENGTH_SHORT
                             ).show()
+
+                            onClickDelete.invoke()
                         }
                         .addOnFailureListener { e ->
                             Toast.makeText(
@@ -121,6 +125,10 @@ class CommentAdapter() : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
             // show alert dialog
             alert.show()
         }
+    }
+
+    fun onClickDelete(onClick: () -> Unit) {
+        this.onClickDelete = onClick
     }
 
 

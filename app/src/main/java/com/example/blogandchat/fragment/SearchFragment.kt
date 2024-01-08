@@ -169,19 +169,21 @@ class SearchFragment : Fragment() {
             def.await()
             delay(5000)
             adapter =
-                VideoAdapter2(requireContext(), videos, object : VideoAdapter2.OnVideoPreparedListener {
-                    override fun onVideoPrepared(exoPlayerItem:ExoPlayerItem) {
-                        exoPlayerItems.add(exoPlayerItem)
-                    }
-                })
+                VideoAdapter2(
+                    requireContext(),
+                    videos,
+                    object : VideoAdapter2.OnVideoPreparedListener {
+                        override fun onVideoPrepared(exoPlayerItem: ExoPlayerItem) {
+                            exoPlayerItems.add(exoPlayerItem)
+                        }
+                    })
 
             binding.viewPager.adapter = adapter
             binding.viewPager.registerOnPageChangeCallback(viewPagerListener)
+
+
         }
-
-
-
-        Log.d("buituyen lisst", videos.size.toString())
+//        Log.d("buituyen lisst", videos.size.toString())
 
     }
 

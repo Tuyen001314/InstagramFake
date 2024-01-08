@@ -9,10 +9,12 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.blogandchat.R
 import com.example.blogandchat.adapter.CommentAdapter
 import com.example.blogandchat.databinding.DialogCommentBinding
 import com.example.blogandchat.model.Comments
+import com.example.blogandchat.session.AppSession
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.EventListener
@@ -57,6 +59,8 @@ class CommentDialogFragment : BottomSheetDialogFragment() {
 		binding.recyclerComments.setHasFixedSize(true)
 		binding.recyclerComments.adapter = adapter
 
+		Glide.with(requireContext()).load(AppSession.instance.userProfile.image).into(binding.circleImageFriend)
+
 		binding.btnAddOmment.setOnClickListener {
 			if (binding.edtComment.text != null) {
 				val commentsMap: MutableMap<String, Any> = HashMap()
@@ -81,6 +85,10 @@ class CommentDialogFragment : BottomSheetDialogFragment() {
 					Toast.LENGTH_SHORT,
 				).show()
 			}
+		}
+
+		adapter.onClickDelete {
+			dismiss()
 		}
 	}
 

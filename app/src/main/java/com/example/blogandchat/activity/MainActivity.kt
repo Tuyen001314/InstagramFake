@@ -15,6 +15,7 @@ import com.example.blogandchat.R
 import com.example.blogandchat.databinding.ActivityMainBinding
 import com.example.blogandchat.fragment.*
 import com.example.blogandchat.model.User
+import com.example.blogandchat.session.AppSession
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -53,6 +54,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         docRef.get().addOnSuccessListener { documentSnapshot ->
             user = documentSnapshot.toObject<User>()!!
             navUserName.text = user.name
+
+            AppSession.instance.userProfile = user
             Glide.with(this).load(user.image).into(navImgUser)
         }
 
