@@ -147,6 +147,11 @@ class ChatFragment : Fragment() {
         viewModel.pairLiveData.removeObservers(viewLifecycleOwner)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.fetchListUser()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
     }

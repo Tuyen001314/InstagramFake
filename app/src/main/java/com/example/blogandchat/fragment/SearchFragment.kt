@@ -19,7 +19,9 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -41,6 +43,7 @@ private const val ARG_PARAM2 = "param2"
 class SearchFragment : Fragment() {
 
     private lateinit var adapter: VideoAdapter2
+    private var isDataFetched = false
 
     private val videos = ArrayList<Video>()
     private val exoPlayerItems = ArrayList<ExoPlayerItem>()
@@ -132,42 +135,45 @@ class SearchFragment : Fragment() {
                 AddPostActivity::class.java
             )
             intent.putExtra("TYPE", "VIDEO")
+            isDataFetched = false
             startActivity(
                 intent
             )
         })
 
 
-        val videoRef = FirebaseStorage.getInstance().reference.child("videos") // Change "videos/video1" to the path where your video data is stored
+        val videoRef =
+            FirebaseStorage.getInstance().reference.child("videos") // Change "videos/video1" to the path where your video data is stored
 
         CoroutineScope(Dispatchers.Main).launch {
-            val def = async {
-                Log.d("buituyen video data", "vflvfl")
-                videoRef.listAll()
-                    .addOnSuccessListener { listResult ->
-                        // The video list has been successfully fetched
-                        for (video in listResult.items) {
-                            // Access each video item
-                            val videoName = video.name
-                            val videoUrlTask =
-                                video.downloadUrl // Get the download URL of the video
+            if (!isDataFetched) {
 
-                            videoUrlTask.addOnSuccessListener { uri ->
-                                videos.add(Video(uri.toString()))
-                                Log.d("buituyen", "$uri")
-                                // Use the video URL to display the video or perform any other necessary operations
-                            }.addOnFailureListener { exception ->
-                                // Handle any errors that occurred while getting the download URL
-                                Log.d("buituyen", "fail ${exception.message}")
+                val def = async {
+                    videoRef.listAll()
+                        .addOnSuccessListener { listResult ->
+                            // The video list has been successfully fetched
+                            for (video in listResult.items) {
+                                // Access each video item
+                                val videoName = video.name
+                                val videoUrlTask =
+                                    video.downloadUrl // Get the download URL of the video
+
+                                videoUrlTask.addOnSuccessListener { uri ->
+                                    videos.add(Video(uri.toString()))
+                                    // Use the video URL to display the video or perform any other necessary operations
+                                }.addOnFailureListener { exception ->
+                                    // Handle any errors that occurred while getting the download URL
+                                }
                             }
                         }
-                    }
-                    .addOnFailureListener { exception ->
-                        // Handle any errors that occurred during the fetch
-                    }
+                        .addOnFailureListener { exception ->
+                            // Handle any errors that occurred during the fetch
+                        }
+                }
+                def.await()
+                delay(5000)
             }
-            def.await()
-            delay(5000)
+
             adapter =
                 VideoAdapter2(
                     requireContext(),
@@ -180,10 +186,7 @@ class SearchFragment : Fragment() {
 
             binding.viewPager.adapter = adapter
             binding.viewPager.registerOnPageChangeCallback(viewPagerListener)
-
-
         }
-//        Log.d("buituyen lisst", videos.size.toString())
 
     }
 

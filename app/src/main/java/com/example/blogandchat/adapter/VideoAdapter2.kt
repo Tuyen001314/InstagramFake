@@ -55,8 +55,9 @@ class VideoAdapter2(
 
             val dataSourceFactory = DefaultDataSource.Factory(binding.root.context)
 
+            Log.e(">>>>>>>>>>", url)
             val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
-                MediaItem.fromUri(Uri.parse(url))
+                MediaItem.fromUri(url)
             )
 
             exoPlayer.setMediaSource(mediaSource)
