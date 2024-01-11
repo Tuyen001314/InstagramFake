@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         pagerAdapter = FragmentNavigator(this.supportFragmentManager, lifecycle)
         pagerAdapter.addFragment(homeFragment)
         pagerAdapter.addFragment(favoriteFragment)
-        pagerAdapter.addFragment(searchFragment)
+       // pagerAdapter.addFragment(searchFragment)
         pagerAdapter.addFragment(chatFragment)
         binding.pagger2.offscreenPageLimit = pagerAdapter.itemCount
         binding.pagger2.adapter = pagerAdapter

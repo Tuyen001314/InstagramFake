@@ -20,6 +20,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -55,6 +56,7 @@ class SpecificChat : AppCompatActivity() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_IMAGE_PICKER = 2
+    val REQUEST_CAMERA_PERMISSION = 99
 
     private val viewModel: ChatViewModel by viewModels()
     var mSenderUid: String = ""
@@ -279,26 +281,24 @@ class SpecificChat : AppCompatActivity() {
                 return
             }
         }
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-//            == PackageManager.PERMISSION_DENIED
-//        ) {
-//
-//            ActivityCompat.requestPermissions(
-//                this,
-//                listOf(Manifest.permission.CAMERA).toTypedArray(),
-//                99
-//            );
-//        }
     }
 
     private fun dispatchTakePictureIntent() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_DENIED
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_DENIED
         ) {
-            return
+            ActivityCompat.requestPermissions(
+                this,
+                listOf(Manifest.permission.CAMERA).toTypedArray(),
+                REQUEST_CAMERA_PERMISSION
+            )
+        } else {
+            openCamera()
         }
+
+    }
+
+    fun openCamera() {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (takePictureIntent.resolveActivity(packageManager) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
@@ -306,6 +306,7 @@ class SpecificChat : AppCompatActivity() {
             // Thông báo cho người dùng rằng không có ứng dụng camera nào được cài đặt
             Toast.makeText(this, "Không tìm thấy ứng dụng camera", Toast.LENGTH_SHORT).show()
         }
+
     }
 
     private fun openGalleryForImage() {
@@ -341,7 +342,7 @@ class SpecificChat : AppCompatActivity() {
 //            }
 //        }
 
-//    private fun startCamera() {
+    //    private fun startCamera() {
 //        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 //
 //        cameraProviderFuture.addListener({
@@ -382,4 +383,24 @@ class SpecificChat : AppCompatActivity() {
 //
 //        }
 //    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Quyền được cấp, thực hiện các thao tác cần thiết ở đây
+                openCamera();
+            } else {
+                // Người dùng từ chối cấp quyền, bạn có thể hiển thị thông báo thông báo tùy ý
+                Toast.makeText(
+                    this,
+                    "Không thể truy cập camera mà không có quyền",
+                    Toast.LENGTH_SHORT
+                ).show();
+            }
+        }
+    }
 }
