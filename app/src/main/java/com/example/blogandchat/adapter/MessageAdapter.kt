@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blogandchat.R
 import com.example.blogandchat.model.Message
-import com.example.blogandchat.utils.AppKey
 import com.google.firebase.auth.FirebaseAuth
 
 class MessageAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -44,11 +43,11 @@ class MessageAdapter(): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val message: Message = listMessage[position]
         if (holder.javaClass == SenderViewHolder::class.java) {
             val viewHolder = holder as SenderViewHolder
-            viewHolder.tvMessage.text = AppKey.decrypt(message.message)
+            viewHolder.tvMessage.text = message.message
             viewHolder.timeOfMessage.text = message.currentTime
         } else {
             val viewHolder = holder as ReceiverViewHolder
-            viewHolder.tvMessage.text = AppKey.decrypt(message.message)
+            viewHolder.tvMessage.text = message.message
             viewHolder.timeOfMessage.text = message.currentTime
         }
     }

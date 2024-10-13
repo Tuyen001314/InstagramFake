@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.blogandchat.model.User
-import com.example.blogandchat.utils.AppKey
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import java.util.*
@@ -33,7 +32,7 @@ class SetUpViewModel : ViewModel() {
                         name = name,
                         image = it.toString(),
                         status = "online",
-                        publicKey = AppKey.getPublicKey()
+                        publicKey = ""
                     )
 
                     val myRef = FirebaseDatabase.getInstance().getReference("/users/$id")

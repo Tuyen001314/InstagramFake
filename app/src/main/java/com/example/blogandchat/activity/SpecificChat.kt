@@ -14,7 +14,6 @@ import com.example.blogandchat.R
 import com.example.blogandchat.adapter.MessageAdapter
 import com.example.blogandchat.databinding.ActivitySpecificChatBinding
 import com.example.blogandchat.model.Message
-import com.example.blogandchat.utils.AppKey
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -41,7 +40,6 @@ class SpecificChat : AppCompatActivity() {
         val mReceiverUid = intent.getStringExtra("receiveruid")
         val mReceiverName = intent.getStringExtra("name")
         val publicKey = intent.getStringExtra("publicKey")
-        AppKey.calculateKey(publicKey.toString())
 
 
         val linearLayoutManager = LinearLayoutManager(this)
@@ -111,7 +109,7 @@ class SpecificChat : AppCompatActivity() {
                 val date = Date()
                 val currentTime = simpleDateFormat.format(calendar.time)
                 val message = firebaseAuth.uid?.let { it1 ->
-                    Message(currentTime = currentTime, message = AppKey.encrypt(enterdMessage),
+                    Message(currentTime = currentTime, message =enterdMessage,
                         senderId = it1, timeStamp = date.time)
                 }
 
